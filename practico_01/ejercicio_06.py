@@ -11,7 +11,7 @@ def numeros_al_final_basico(lista: List[Union[float, str]]) -> List[Union[float,
     numeros = []
     
     for elemento in lista:
-        if type(elemento) == str:
+        if isinstance(elemento, str):
             letras.append(elemento)
         else:
             numeros.append(elemento)
