@@ -9,13 +9,13 @@ def numeros_al_final_basico(lista: List[Union[float, str]]) -> List[Union[float,
     """
     letras = []
     numeros = []
-    
+
     for elemento in lista:
         if isinstance(elemento, str):
             letras.append(elemento)
         else:
             numeros.append(elemento)
-    
+
     return letras + numeros
 
 
@@ -80,12 +80,12 @@ def numeros_al_final_recursivo(lista: List[Union[float, str]]) -> List[Union[flo
     """CHALLENGE OPCIONAL - Re-escribir de forma recursiva."""
     if not lista:
         return []
-    
+
     primero = lista[0]
     resto = lista[1:]
 
     if isinstance(primero, (int, float)):
-        return numeros_al_final_recursivo(resto) + [primero] 
+        return numeros_al_final_recursivo(resto) + [primero]
     else:
         return [primero] + numeros_al_final_recursivo(resto)
 
