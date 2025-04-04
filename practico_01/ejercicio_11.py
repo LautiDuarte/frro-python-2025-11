@@ -2,6 +2,7 @@
 
 from typing import Iterable
 
+
 def suma_cubo_pares_for(numeros: Iterable[int]) -> int:
     """Toma una lista de números, los eleva al cubo, y devuelve la suma de
     los elementos pares.
