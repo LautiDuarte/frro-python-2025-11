@@ -25,7 +25,7 @@ def sumatoria_sum(n: int) -> int:
     """Re-Escribir utilizando la función sum y sin usar bucles.
     Referencia: https://docs.python.org/3/library/functions.html#sum
     """
-    return sum(range(1, n+1))
+    return sum(range(1, n + 1))
 
 
 # NO MODIFICAR - INICIO
