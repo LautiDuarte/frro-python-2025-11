@@ -11,7 +11,7 @@ def suma_cubo_pares_for(numeros: Iterable[int]) -> int:
     """
     cubos = []
     for numero in numeros:
-        cubos.append( numero ** 3)
+        cubos.append(numero ** 3)
     suma = 0
     for cubo in cubos:
         if cubo % 2 == 0:
@@ -75,7 +75,7 @@ numeros_al_cubo = list(map(lambda x: x ** 3, numeros))
 
 # Escribir una función lambda que permita filtrar todos los elementos pares
 
-numeros_al_cubo_pares = list(filter(lambda x: x%2 == 0, numeros_al_cubo))
+numeros_al_cubo_pares = list(filter(lambda x: x % 2 == 0, numeros_al_cubo))
 
 
 # Escribir una función Lambda que sume todos los elementos
