@@ -7,6 +7,7 @@ def maximo_basico(a: float, b: float) -> float:
     else:
         return b
 
+
 # NO MODIFICAR - INICIO
 assert maximo_basico(10, 5) == 10
 assert maximo_basico(9, 18) == 18
@@ -30,7 +31,7 @@ assert maximo_libreria(9, 18) == 18
 
 
 def maximo_ternario(a: float, b: float) -> float:
-     return a if a > b else b
+    return a if a > b else b
 
 
 # NO MODIFICAR - INICIO
