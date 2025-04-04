@@ -21,7 +21,7 @@ assert maximo_encadenado(24, 9, 18) == 24
 
 
 def maximo_cuadruple(a: float, b: float, c: float, d: float) -> float:
-    return max(a,b,c,d)
+    return max(a, b, c, d)
 
 
 # NO MODIFICAR - INICIO
