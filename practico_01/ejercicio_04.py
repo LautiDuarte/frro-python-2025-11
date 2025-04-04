@@ -4,15 +4,15 @@
 def es_vocal_if(letra: str) -> bool:
      if letra.lower() == "a": 
         return True
-    elif letra[0].lower() == "e":
+     elif letra[0].lower() == "e":
         return True
-    elif letra[0].lower() == "i":
+     elif letra[0].lower() == "i":
         return True
-    elif letra[0].lower() == "o":
+     elif letra[0].lower() == "o":
         return True
-    elif letra[0].lower() == "u":
+     elif letra[0].lower() == "u":
         return True    
-    else: return False
+     else: return False
 
 
 # NO MODIFICAR - INICIO
