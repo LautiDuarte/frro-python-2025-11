@@ -5,10 +5,10 @@ from typing import Union
 
 def operacion_basica(a: float, b: float, multiplicar: bool) -> Union[float, str]:
     if (multiplicar):
-        resultado = a*b
-    elif (multiplicar == False):
+        resultado = a * b
+    elif (multiplicar is False):
         if (b != 0):
-            resultado = a/b
+            resultado = a / b
         else:
             resultado = "Operación no válida"
     return resultado
@@ -31,10 +31,10 @@ assert operacion_basica(1, 0, False) == "Operación no válida"
 
 def operacion_multiple(a: float, b: float, multiplicar: bool) -> Union[float, str]:
     if (multiplicar):
-        return a*b
-    elif (multiplicar == False and b != 0):
-        return a/b
-    elif (multiplicar == False and b == 0):
+        return a * b
+    elif (multiplicar is False and b != 0):
+        return a / b
+    elif (multiplicar is False and b == 0):
         return "Operación no válida"
 
 
