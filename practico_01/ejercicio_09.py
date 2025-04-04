@@ -7,7 +7,7 @@ def sumatoria_basico(n: int) -> int:
     Restricción: Utilizar un bucle for.
     """
     total = 0
-    for i in range(1,n+1):
+    for i in range(1, n + 1):
         total = total + i
     return total
 
@@ -44,7 +44,7 @@ def sumatoria_reduce(n: int) -> int:
     """CHALLENGE OPCIONAL: Re-escribir utilizando reduce.
     Referencia: https://docs.python.org/3/library/functools.html#functools.reduce
     """
-    return reduce(lambda x, y: x+y, range(1, n+1))
+    return reduce(lambda x, y: x + y, range(1, n + 1))
 
 
 # NO MODIFICAR - INICIO
@@ -61,7 +61,7 @@ def sumatoria_gauss(n: int) -> int:
     """CHALLENGE OPCIONAL: Re-Escribir utilizando suma de Gauss.
     Referencia: https://es.wikipedia.org/wiki/1_%2B_2_%2B_3_%2B_4_%2B_%E2%8B%AF
     """
-    return n*(n+1)/2
+    return n * (n + 1) / 2
 
 
 # NO MODIFICAR - INICIO
