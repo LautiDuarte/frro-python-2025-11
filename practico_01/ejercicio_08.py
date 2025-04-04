@@ -10,10 +10,10 @@ def superposicion_basico(lista_1: Iterable[Any], lista_2: Iterable[Any]) -> bool
     Restricción: Utilizar bucles anidados.
     """
     for i in lista_1:
-      for j in lista_2:
-         if i == j:
-            return True
-    
+        for j in lista_2:
+            if i == j:
+                return True
+
     return False
 
 
