@@ -12,7 +12,25 @@ class Auto:
     Referencia: https://docs.python.org/3/library/functions.html#property"""
 
     # Completar
+    def __init__(self, nombre, precio):
+        self._nombre = nombre.capitalize()
+        self._precio = precio
 
+    @property
+    def nombre(self):
+        return self._nombre
+
+    @nombre.setter
+    def nombre(self, value):
+        raise AttributeError("No se puede modificar el nombre")
+
+    @property
+    def precio(self):
+        return round(self._precio, 2)
+
+    @precio.setter
+    def precio(self, value):
+        self._precio = value
 
 # NO MODIFICAR - INICIO
 auto = Auto("Ford", 12_875.456)
@@ -33,14 +51,35 @@ except AttributeError:
 ###############################################################################
 
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class Auto:
     """Re-Escribir utilizando DataClasses"""
 
     # Completar
+    _nombre: str = field(init=False, repr=False)
+    _precio: float = field(init=False, repr=False)
 
+    def __init__(self, nombre, precio):
+        self._nombre = nombre.capitalize()
+        self._precio = precio
+
+    @property
+    def nombre(self):
+        return self._nombre
+
+    @nombre.setter
+    def nombre(self, value):
+        raise AttributeError("No se puede modificar el nombre")
+
+    @property
+    def precio(self):
+        return round(self._precio, 2)
+
+    @precio.setter
+    def precio(self, value):
+        self._precio = value
 
 # NO MODIFICAR - INICIO
 auto = Auto("Ford", 12_875.456)
