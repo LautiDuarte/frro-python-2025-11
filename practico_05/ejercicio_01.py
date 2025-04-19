@@ -19,4 +19,3 @@ class Socio(Base):
     dni = Column(Integer, unique=True)
     nombre = Column(String(250))
     apellido = Column(String(250))
-
