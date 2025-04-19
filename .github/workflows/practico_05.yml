@@ -21,9 +21,11 @@ jobs:
         with:
           python-version: '3.8'
           architecture: 'x64'
-
+      
       - name: Install Dependencies
-        run: pip install pytest
+        run:  |
+          pip install pytest
+          pip install sqlalchemy
 
       - name: Run Basic Tests
         run: pytest practico_05/practico_05_test.py
