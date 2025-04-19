@@ -35,7 +35,7 @@ class NegocioSocio(object):
         if socio:
             return socio
         else:
-            return None 
+            return None
 
     def buscar_dni(self, dni_socio):
         """
