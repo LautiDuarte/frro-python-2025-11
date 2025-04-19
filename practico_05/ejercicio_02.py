@@ -6,8 +6,8 @@ from ejercicio_01 import Base, Socio
 
 from typing import List, Optional
 
-class DatosSocio():
 
+class DatosSocio():
 
     def __init__(self):
         """Crea la base de datos y la tabla Socio"""
