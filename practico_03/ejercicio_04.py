@@ -3,6 +3,7 @@
 
 # NO MODIFICAR - INICIO
 class Animal:
+    
     def __init__(self, edad: int = 0):
         self.edad = edad
 
@@ -17,6 +18,7 @@ class Perro(Animal):
     sobrecargar el método descripción para que devuelva:
     "Soy un perro y" + método descripción del padre
     """
+    
     # Completar
     def __init__(self, edad: int = 0, raza: str = ""):
         super().__init__(edad)
@@ -25,8 +27,8 @@ class Perro(Animal):
     def descripcion(self) -> str:
         return f"Soy un perro y {super().descripcion().lower()}"
 
-# NO MODIFICAR - INICIO
 
+# NO MODIFICAR - INICIO
 terrier = Perro(edad=8, raza="Yorkshire Terrier")
 cachorro = Perro(edad=1)
 dogo = Perro(raza="Dogo")
@@ -59,8 +61,8 @@ class Perro(Animal):
     def descripcion(self) -> str:
         return f"Soy un perro y {super().descripcion().lower()}"
 
-# NO MODIFICAR - INICIO
 
+# NO MODIFICAR - INICIO
 terrier = Perro(edad=8, raza="Yorkshire Terrier")
 cachorro = Perro(edad=1)
 dogo = Perro(raza="Dogo")
@@ -69,5 +71,4 @@ assert Animal(10).descripcion() == "Tengo 10 años"
 assert terrier.descripcion() == "Soy un perro y tengo 8 años"
 assert dogo.descripcion() == "Soy un perro y tengo 0 años"
 assert cachorro.descripcion() == "Soy un perro y tengo 1 años"
-
 # NO MODIFICAR - FIN
