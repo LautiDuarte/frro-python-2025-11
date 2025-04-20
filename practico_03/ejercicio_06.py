@@ -32,6 +32,7 @@ class Article:
         return hash(self.name)
 
 # NO MODIFICAR - INICIO
+
 class ShoppingCart:
     """Agregar los métodos que sean necesarios para que los test funcionen.
     Hint: los métodos necesarios son todos magic methods
@@ -77,6 +78,7 @@ class ShoppingCart:
         return ShoppingCart(self.articles + other.articles)
 
 # NO MODIFICAR - INICIO
+
 
 manzana = Article("Manzana")
 pera = Article("Pera")
