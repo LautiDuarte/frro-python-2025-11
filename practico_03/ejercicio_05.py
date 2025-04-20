@@ -3,7 +3,7 @@
 
 class Auto:
     """La clase auto tiene dos propiedades, precio y marca. La marca se define
-    obligatoriamente al construir la clase y siempre que se devuelve, se 
+    obligatoriamente al construir la clase y siempre que se devuelve, se
     devuelve con la primer letra en mayúscula y no se puede modificar. El precio
     puede modificarse pero cuando se muestra, se redondea a 2 decimales
     
@@ -33,6 +33,7 @@ class Auto:
         self._precio = value
 
 # NO MODIFICAR - INICIO
+
 auto = Auto("Ford", 12_875.456)
 
 assert auto.nombre == "Ford"
@@ -52,6 +53,7 @@ except AttributeError:
 
 
 from dataclasses import dataclass, field
+
 
 @dataclass
 class Auto:
@@ -82,6 +84,7 @@ class Auto:
         self._precio = value
 
 # NO MODIFICAR - INICIO
+
 auto = Auto("Ford", 12_875.456)
 
 assert auto.nombre == "Ford"
