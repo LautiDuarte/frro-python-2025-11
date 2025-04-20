@@ -21,6 +21,7 @@ class Rectangulo:
 # NO MODIFICAR - INICIO
 
 # Test Constructor
+
 rec = Rectangulo(10, 10)
 assert rec.base == 10
 assert rec.altura == 10
