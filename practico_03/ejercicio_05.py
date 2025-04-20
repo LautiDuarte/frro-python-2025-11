@@ -9,9 +9,9 @@ class Auto:
     
     Restricción: Usar Properties
     
-    Referencia: https://docs.python.org/3/library/functions.html#property"""
+    Referencia: https://docs.python.org/3/library/functions.html#property
+    """
 
-    # Completar
     def __init__(self, nombre, precio):
         self._nombre = nombre.capitalize()
         self._precio = precio
@@ -59,7 +59,6 @@ from dataclasses import dataclass, field
 class Auto:
     """Re-Escribir utilizando DataClasses"""
 
-    # Completar
     _nombre: str = field(init=False, repr=False)
     _precio: float = field(init=False, repr=False)
 
