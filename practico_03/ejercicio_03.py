@@ -22,9 +22,11 @@ class Persona:
         self.sexo = sexo
         self.peso = peso
         self.altura = altura
+
     
     def es_mayor_edad(self) -> bool:
         return self.edad >= 18
+
 
 # NO MODIFICAR - INICIO
 assert Persona("Juan", 18, "H", 85, 175.9).es_mayor_edad()
@@ -50,6 +52,7 @@ class Persona:
 
     def es_mayor_edad(self) -> bool:
         return self.edad >= 18
+
 
 # NO MODIFICAR - INICIO
 assert Persona("Juan", 18, "H", 85, 175.9).es_mayor_edad()
