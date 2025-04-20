@@ -1,7 +1,7 @@
 """Magic Methods"""
 
 from __future__ import annotations
-from typing import List
+from typing import List, Optional
 
 
 # NO MODIFICAR - INICIO
@@ -17,7 +17,19 @@ class Article:
     # NO MODIFICAR - FIN
 
     # Completar
+    def __str__(self) -> str:
+        return self.name
 
+    def __repr__(self) -> str:
+        return f"Article('{self.name}')"
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Article):
+            return NotImplemented
+        return self.name == other.name
+
+    def __hash__(self) -> int:
+        return hash(self.name)
 
 # NO MODIFICAR - INICIO
 class ShoppingCart:
@@ -50,7 +62,19 @@ class ShoppingCart:
     # NO MODIFICAR - FIN
 
     # Completar
+    def __str__(self) -> str:
+        return str([str(article) for article in self.articles])
 
+    def __repr__(self) -> str:
+        return f"ShoppingCart([{', '.join(repr(a) for a in self.articles)}])"
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, ShoppingCart):
+            return NotImplemented
+        return sorted(self.articles, key=lambda x: x.name) == sorted(other.articles, key=lambda x: x.name)
+
+    def __add__(self, other: ShoppingCart) -> ShoppingCart:
+        return ShoppingCart(self.articles + other.articles)
 
 # NO MODIFICAR - INICIO
 
