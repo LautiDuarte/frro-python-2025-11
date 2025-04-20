@@ -32,8 +32,8 @@ class Auto:
     def precio(self, value):
         self._precio = value
 
-# NO MODIFICAR - INICIO
 
+# NO MODIFICAR - INICIO
 auto = Auto("Ford", 12_875.456)
 
 assert auto.nombre == "Ford"
@@ -83,8 +83,8 @@ class Auto:
     def precio(self, value):
         self._precio = value
 
-# NO MODIFICAR - INICIO
 
+# NO MODIFICAR - INICIO
 auto = Auto("Ford", 12_875.456)
 
 assert auto.nombre == "Ford"
