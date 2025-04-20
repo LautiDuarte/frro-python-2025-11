@@ -23,7 +23,6 @@ class Persona:
         self.peso = peso
         self.altura = altura
 
-    
     def es_mayor_edad(self) -> bool:
         return self.edad >= 18
 
@@ -38,6 +37,7 @@ assert not Persona("Julia", 16, "M", 65, 162.4).es_mayor_edad()
 
 
 from dataclasses import dataclass
+
 
 @dataclass
 class Persona:
