@@ -12,9 +12,7 @@ class Articulo:
     """
 
     # Completar
-    
     _last_id = 0
-    
     def __init__(self, nombre: Optional[str] = None):
         self.nombre = nombre
         self.id_ = Articulo._get_next_id()
