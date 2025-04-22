@@ -3,19 +3,44 @@
 import sqlite3
 
 def crear_tabla():
-    """Implementar la funcion crear_tabla, que cree una tabla Persona con:
-        - IdPersona: Int() (autoincremental)
-        - Nombre: Char(30)
-        - FechaNacimiento: Date()
-        - DNI: Int()
-        - Altura: Int()
-    """
-    pass # Completar
+
+    connection = sqlite3.connect("ejercicio_01.db")
+    cursor = connection.cursor()
+
+
+    cursor.execute("DROP TABLE IF EXISTS Persona;")
+
+
+    cursor.execute("""
+        CREATE TABLE Persona (
+            IdPersona INTEGER PRIMARY KEY AUTOINCREMENT,
+            Nombre TEXT NOT NULL,
+            FechaNacimiento DATE NOT NULL,
+            DNI INTEGER NOT NULL,
+            Altura INTEGER NOT NULL
+        );
+    """)
+
+    cursor.execute('DELETE FROM sqlite_sequence WHERE name="Persona";')
+
+
+    connection.commit()
+    connection.close()
+
+    pass 
 
 
 def borrar_tabla():
-    """Implementar la funcion borrar_tabla, que borra la tabla creada 
-    anteriormente."""
+    
+    connection = sqlite3.connect("ejercicio_01.db")
+    cursor = connection.cursor()
+
+    cursor.execute("""
+    DROP TABLE IF EXISTS Persona;
+    """)
+    connection.commit()
+    connection.close()
+
     pass # Completar
 
 
