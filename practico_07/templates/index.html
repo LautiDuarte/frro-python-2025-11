@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Socios</title>
+</head>
+
+<body>
+  <h1>Listado de Socios</h1>
+  <a href="{{ url_for('alta') }}">Alta</a>
+  <table border="1">
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Apellido</th>
+      <th>DNI</th>
+      <th>Acciones</th>
+    </tr>
+    {% for s in socios %}
+    <tr>
+      <td>{{ s.id_socio }}</td>
+      <td>{{ s.nombre }}</td>
+      <td>{{ s.apellido }}</td>
+      <td>{{ s.dni }}</td>
+      <td>
+        <a href="{{ url_for('modificar', id=s.id_socio) }}">Modificar</a>
+        <a href="{{ url_for('baja', id=s.id_socio) }}">Baja</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</body>
+
+</html>

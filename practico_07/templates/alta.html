@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Alta Socio</title>
+</head>
+
+<body>
+  <h1>Alta de Socio</h1>
+  <form method="post">
+    Nombre: <input name="nombre"><br>
+    Apellido: <input name="apellido"><br>
+    DNI: <input name="dni"><br>
+    <button type="submit">Guardar</button>
+    <a href="{{ url_for('index') }}">Cancelar</a>
+  </form>
+</body>
+
+</html>
