@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Mapa de incidentes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 flex flex-col h-screen">
+
+  <!-- Header -->
+  <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
+    <h1 class="text-lg font-bold">Mapa de Incidentes</h1>
+    <div>
+      <button id="btnRegister" class="bg-green-500 px-3 py-1 rounded mr-2">Registrarse</button>
+      <button id="btnLogin" class="bg-white text-blue-600 px-3 py-1 rounded mr-2">Login</button>
+      <button id="btnLogout" class="bg-red-500 px-3 py-1 rounded hidden">Logout</button>
+    </div>
+  </header>
+
+  <!-- Formulario de login -->
+  <div id="loginForm" class="hidden fixed inset-0 bg-gray-800 bg-opacity-60 flex items-center justify-center z-[1000]">
+    <div class="bg-white p-6 rounded-lg shadow w-80 relative">
+      <!-- Botón cerrar -->
+      <button id="closeLogin"
+        class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 font-bold">&times;</button>
+      <h2 class="text-xl font-bold mb-4">Iniciar sesión</h2>
+      <input id="emailLogin" type="email" placeholder="Email" class="w-full border p-2 mb-2 rounded" />
+      <input id="passwordLogin" type="password" placeholder="Contraseña" class="w-full border p-2 mb-4 rounded" />
+      <button id="doLogin" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Entrar</button>
+    </div>
+  </div>
+
+  <!-- Formulario de registro -->
+  <div id="registerForm"
+    class="hidden fixed inset-0 bg-gray-800 bg-opacity-60 flex items-center justify-center z-[1000]">
+    <div class="bg-white p-6 rounded-lg shadow w-96 relative">
+      <!-- Botón cerrar -->
+      <button id="closeRegister"
+        class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 font-bold">&times;</button>
+      <h2 class="text-xl font-bold mb-4">Crear cuenta</h2>
+      <input id="nombre" type="text" placeholder="Nombre" class="w-full border p-2 mb-2 rounded" />
+      <input id="apellido" type="text" placeholder="Apellido" class="w-full border p-2 mb-2 rounded" />
+      <input id="emailRegister" type="email" placeholder="Email" class="w-full border p-2 mb-2 rounded" />
+      <input id="passwordRegister" type="password" placeholder="Contraseña" class="w-full border p-2 mb-2 rounded" />
+      <select id="rol" class="w-full border p-2 mb-4 rounded">
+        <option value="usuario">Usuario</option>
+        <option value="operador">Operador</option>
+      </select>
+      <button id="doRegister" class="bg-green-600 text-white px-4 py-2 rounded w-full">Registrarse</button>
+    </div>
+  </div>
+
+  <!-- Mapa -->
+  <div id="map"></div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="{% static 'js/mapa.js' %}"></script>
+</body>
+
+</html>
