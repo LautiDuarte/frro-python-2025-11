@@ -4,7 +4,7 @@
 
 El proyecto consiste en el desarrollo de un simulador de emergencias urbanas con logística de respuesta automática, orientado a representar de forma realista y visual cómo distintas unidades de emergencia (como bomberos, ambulancias o cuadrillas eléctricas) actúan ante situaciones críticas en una ciudad. La aplicación ofrece a los usuarios la posibilidad de registrar incidentes, como incendios, accidentes de tránsito o cortes de luz, y tiene como objetivo gestionar y asignar los recursos disponibles de forma óptima, teniendo en cuenta la gravedad de cada evento, su localización y las condiciones del tráfico urbano simulado.
 
-## Modelo de Dominio
+## Diagrama Entidad - Relación
 
 <img width="886" height="750" alt="image" src="https://github.com/user-attachments/assets/e6d2c6e6-c5e6-4046-b065-b28cf2ab6fd0" />
 
