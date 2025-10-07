@@ -30,17 +30,17 @@ Definir los requerimientos del sistema.
 
 ### Funcionales
 
-R01. El sistema debe permitir registrar nuevos usuarios proporcionando nombre, apellido, email, contraseña y rol.
-R02. El sistema debe permitir iniciar sesión con email y contraseña.
-R03. El sistema debe permitir cerrar sesión y eliminar el token de autenticación.
-R04. El sistema debe diferenciar los roles de usuario (Administrador, Operador, Usuario).
-R05. El sistema debe autenticar mediante tokens JWT a los usuarios que acceden a funciones protegidas.
-R06. El sistema debe mostrar en un mapa todos los incidentes registrados con su título, descripción y ubicación.
-R07. El sistema debe permitir que los usuarios autenticados reporten un nuevo incidente haciendo clic en el mapa.
-R08. El sistema debe permitir visualizar todos los incidentes en el mapa mediante marcadores.
-R09. El sistema debe validar que solo los usuarios autenticados puedan crear incidentes.
-R10. El sistema debe registrar la fecha y ubicación del incidente al momento de su creación.
-R11. El sistema debe permitir a los administradores consultar todos los incidentes registrados.
+- R01. El sistema debe permitir registrar nuevos usuarios proporcionando nombre, apellido, email, contraseña y rol.
+- R02. El sistema debe permitir iniciar sesión con email y contraseña.
+- R03. El sistema debe permitir cerrar sesión y eliminar el token de autenticación.
+- R04. El sistema debe diferenciar los roles de usuario (Administrador, Operador, Usuario).
+- R05. El sistema debe autenticar mediante tokens JWT a los usuarios que acceden a funciones protegidas.
+- R06. El sistema debe mostrar en un mapa todos los incidentes registrados con su título, descripción y ubicación.
+- R07. El sistema debe permitir que los usuarios autenticados reporten un nuevo incidente haciendo clic en el mapa.
+- R08. El sistema debe permitir visualizar todos los incidentes en el mapa mediante marcadores.
+- R09. El sistema debe validar que solo los usuarios autenticados puedan crear incidentes.
+- R10. El sistema debe registrar la fecha y ubicación del incidente al momento de su creación.
+- R11. El sistema debe permitir a los administradores consultar todos los incidentes registrados.
 
 ### No Funcionales
 
