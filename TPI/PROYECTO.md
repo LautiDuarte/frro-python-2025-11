@@ -102,7 +102,7 @@ Listado y descripción breve de los requerimientos no funcionales. Utilizar las 
 
 ## Stack Tecnológico
 
-###Capa de Datos
+### Capa de Datos
 
 Base de datos: MySQL.
 
@@ -110,7 +110,7 @@ ORM: Django ORM.
 
 Motivo: permite manejo sencillo de modelos, migraciones automáticas y consultas seguras sin SQL directo.
 
-###Capa de Negocio
+### Capa de Negocio
 
 Framework: Django REST Framework.
 
@@ -118,7 +118,7 @@ Autenticación: rest_framework_simplejwt para gestión de tokens JWT.
 
 Motivo: separación clara entre endpoints, control de permisos y serialización de datos.
 
-###Capa de Presentación
+### Capa de Presentación
 
 Frontend: HTML, CSS y JavaScript nativo (puede integrarse con frameworks como Vue o React en el futuro).
 
