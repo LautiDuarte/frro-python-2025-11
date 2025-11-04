@@ -7,7 +7,8 @@ class TipoRecurso(models.Model):
         return self.nombre
 
 class Recurso(models.Model):
-    ubicacion = models.CharField(max_length=200)
+    latitud = models.FloatField(default=None)
+    longitud = models.FloatField(default=None)
     estado = models.CharField(max_length=20)
 
     tipo = models.ForeignKey(TipoRecurso, on_delete=models.CASCADE, related_name="recursos")

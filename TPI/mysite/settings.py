@@ -71,7 +71,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "frontend" / "templates"],
+        'DIRS': [os.path.join(BASE_DIR / "frontend" / "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -94,7 +94,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'simulador_incidentes',
         'USER': 'root',
-        'PASSWORD': 'administrador',
+        'PASSWORD': 'root',
         'HOST': 'localhost',   
         'PORT': '3306',
         'OPTIONS': {
@@ -155,3 +155,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ]
 }
+
+LOGIN_REDIRECT_URL = '/mapa/'
+
+LOGOUT_REDIRECT_URL = '/'
