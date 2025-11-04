@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from .models import Recurso, TipoRecurso
+from .models import Recurso, Institucion
 
-class TipoRecursoSerializer(serializers.ModelSerializer):
+class InstitucionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TipoRecurso
+        model = Institucion
         fields = "__all__"
 
 class RecursoSerializer(serializers.ModelSerializer):
