@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from apps.incidentes.forms import ReporteIncidenteForm # Importa el formulario
 
+@login_required
 def mapa(request):
     return render(request, "mapa.html")
 
