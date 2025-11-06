@@ -1,17 +1,22 @@
 from django.db import models
 
-class TipoRecurso(models.Model):
+class Institucion(models.Model):
     nombre = models.CharField(max_length=100)
+    latitud = models.FloatField(default=None)
+    longitud = models.FloatField(default=None)
 
     def __str__(self):
         return self.nombre
 
 class Recurso(models.Model):
-    latitud = models.FloatField(default=None)
-    longitud = models.FloatField(default=None)
+    # Explicit primary key so static analyzers (Pylance) know the `id` attribute exists.
+    # The project sets DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField' in settings,
+    # so use BigAutoField here to match that default and avoid mismatches.
+    id = models.BigAutoField(primary_key=True)
+    
     estado = models.CharField(max_length=20)
 
-    tipo = models.ForeignKey(TipoRecurso, on_delete=models.CASCADE, related_name="recursos")
+    institucion_base = models.ForeignKey(Institucion, on_delete=models.CASCADE, related_name="recursos")
 
     def __str__(self):
-        return f"Recurso {self.id} - {self.tipo.nombre}"
+        return f"Recurso {self.id} - {self.institucion_base.nombre}"

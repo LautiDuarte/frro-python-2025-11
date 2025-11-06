@@ -1,10 +1,10 @@
 from rest_framework import viewsets
-from .models import Recurso, TipoRecurso
-from .serializers import RecursoSerializer, TipoRecursoSerializer
+from .models import Recurso, Institucion
+from .serializers import RecursoSerializer, InstitucionSerializer
 
-class TipoRecursoViewSet(viewsets.ModelViewSet):
-    queryset = TipoRecurso.objects.all()
-    serializer_class = TipoRecursoSerializer
+class InstitucionViewSet(viewsets.ModelViewSet):
+    queryset = Institucion.objects.all()
+    serializer_class = InstitucionSerializer
 
 class RecursoViewSet(viewsets.ModelViewSet):
     queryset = Recurso.objects.all()
