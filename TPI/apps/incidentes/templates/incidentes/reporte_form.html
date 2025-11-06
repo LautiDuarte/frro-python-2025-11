@@ -1,0 +1,10 @@
+<form method="post" action="{% url 'mapa' %}">
+    {% csrf_token %}
+    
+    {{ form.as_p }} 
+
+    <button type="submit" 
+            style="background-color: #28a745; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
+        Enviar Reporte
+    </button>
+</form>

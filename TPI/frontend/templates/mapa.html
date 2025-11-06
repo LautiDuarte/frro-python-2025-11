@@ -3,34 +3,106 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>Mapa de incidentes</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    #map {
-      height: 100vh;
-      width: 100%;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <title>Mapa de incidentes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* Estilo base del Sidebar */
+        .sidebar {
+    height: 100%;
+    width: 250px;
+    position: fixed; 
+    z-index: 2000; 
+    top: 0;
+    left: -240px; 
+    
+    /* --- CÓDIGO DE DEGRADADO EXTENSO Y NOTORIO --- */
+    /* Va de un azul oscuro/marino (#1e3c72) a un negro profundo (#2a5298) */
+    background-image: linear-gradient(to bottom, #1e3c72, #2a5298); 
+    
+    /* Puedes probar este degradado si quieres que vaya de arriba a abajo en más pasos: */
+    /* background-image: linear-gradient(to bottom, #1a2a40 0%, #0d1a29 50%, #1a2a40 100%); */
+    
+    background-color: #1e3c72; /* Color de respaldo */
+    
+    overflow-x: hidden;
+    transition: 0.3s;
+    padding-top: 60px;
+    color: white; 
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.7);
+}
+
+        /* Efecto Hover: Desplegar */
+        .sidebar:hover {
+            left: 0; 
+        }
+
+        /* Estilos para los enlaces dentro del sidebar */
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #555;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 flex flex-col h-screen">
 
-  <!-- Header -->
-  <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
-    <h1 class="text-lg font-bold">Mapa de Incidentes</h1>
-    <div>
-      <button id="btnLogout" class="bg-red-500 px-3 py-1 rounded hidden">Logout</button>
+    <div id="mySidebar" class="sidebar">
+        <h3 style="padding: 15px 25px; border-bottom: 1px solid #555;">Menú Principal</h3>
+        
+        <form id="logoutForm" method="post" action="{% url 'logout' %}" style="display: none;">
+         {% csrf_token %}
+          </form>
+
+        <a href="#" onclick="document.getElementById('logoutForm').submit(); return false;">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
+        
+        <a href="#">Incidentes Pendientes</a>
+        <a href="#">Mi Perfil</a>
     </div>
-  </header>
 
-  <!-- Mapa -->
-  <div id="map"></div>
+    <header class="bg-blue-600 text-white p-4 flex justify-between items-center" style="position: relative; z-index: 1000;">
+        <h1 class="text-lg font-bold">Mapa de Incidentes</h1>
+        </header>
 
-  <!-- Scripts -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="{% static 'js/mapa.js' %}"></script>
+    <div id="map"></div>
+
+    <div style="position: fixed; top: 100px; right: 20px; z-index: 1000;">
+        <button onclick="document.getElementById('modalForm').style.display='block'" 
+                style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Reportar Incidente 🚨
+        </button>
+    </div>
+
+    <div id="modalForm" style="display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
+            <span onclick="document.getElementById('modalForm').style.display='none'" 
+                  style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            
+            <h2>Reportar Nuevo Incidente</h2>
+            
+            {% include 'incidentes/reporte_form.html' %}
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="{% static 'js/mapa.js' %}"></script>
+
 </body>
-
 </html>
