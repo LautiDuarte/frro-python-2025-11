@@ -3,6 +3,7 @@ from django.conf import settings # Usar settings.AUTH_USER_MODEL es la mejor pr√
 
 class Institucion(models.Model):
     nombre = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=50, default=None) 
     latitud = models.FloatField(default=None, null=True, blank=True)
     longitud = models.FloatField(default=None, null=True, blank=True)
 
@@ -11,9 +12,7 @@ class Institucion(models.Model):
 
 class Recurso(models.Model):
     id = models.BigAutoField(primary_key=True)
-    
     estado = models.CharField(max_length=20)
-
     institucion_base = models.ForeignKey(Institucion, on_delete=models.CASCADE, related_name="recursos")
     
     # Se combina la salida y se maneja el caso NULL
