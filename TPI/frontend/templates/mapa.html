@@ -172,7 +172,7 @@
             cargarIncidentes();
 
         function cargarInstituciones() {
-            fetch('/api/tipos-recursos/')
+            fetch('/api/recursos/instituciones/')
                 .then(res => res.json())
                 .then(data => {
                     data.forEach(inst => {
