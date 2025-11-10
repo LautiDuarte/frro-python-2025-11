@@ -7,6 +7,21 @@ from apps.incidentes.forms import ReporteIncidenteForm
 from django.contrib import messages
 from apps.incidentes.models import Incidente
 from apps.recursos.models import Recurso
+import json
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from apps.recursos.models import Institucion
+from apps.recursos.serializers import InstitucionSerializer, RecursoSerializer
+from rest_framework import viewsets 
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from django.views import generic
+from apps.usuarios.forms import CustomUserCreationForm
+from django.contrib.auth.decorators import login_required
+from apps.incidentes.forms import ReporteIncidenteForm
+from django.contrib import messages
+
 
 
 # Vista de registro usando el formulario personalizado
@@ -16,12 +31,15 @@ class SignUpView(generic.CreateView):
     template_name = 'registration/register.html'
 
 
-@login_required 
 def index(request):
     """
     Router principal después del login. Decide a dónde enviar al usuario según su rol.
     """
+    if not request.user.is_authenticated:
+        return render(request, 'home.html')
+    
     rol_usuario = request.user.rol.lower()
+
 
     # Si es USUARIO (Hospital), lo enviamos a la vista que solo muestra la tabla.
     if rol_usuario == 'usuario':
@@ -77,16 +95,6 @@ def mapa(request):
 
 # En frontend/views.py
 
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from django.views import generic
-from apps.usuarios.forms import CustomUserCreationForm
-from django.contrib.auth.decorators import login_required
-from apps.incidentes.forms import ReporteIncidenteForm
-from django.contrib import messages
-from apps.incidentes.models import Incidente
-# --- IMPORTACIONES ADICIONALES NECESARIAS ---
-from apps.recursos.models import Recurso # Para listar los recursos
 
 
 # ... (AQUÍ VAN TUS OTRAS VISTAS: SignUpView, index, mapa) ...
@@ -137,3 +145,4 @@ def incidentes_asignados(request):
     }
     
     return render(request, 'usuario_incidentes.html', context)
+

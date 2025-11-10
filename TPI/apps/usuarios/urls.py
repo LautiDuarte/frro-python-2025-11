@@ -4,4 +4,4 @@ from .views import UsuarioViewSet
 router = DefaultRouter()
 router.register(r'usuarios', UsuarioViewSet)
 
-urlpatterns = router.urls
+urlpatterns = router.urls # Correcto: define urlpatterns UNA vez

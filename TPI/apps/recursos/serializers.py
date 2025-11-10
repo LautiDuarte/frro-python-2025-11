@@ -10,3 +10,4 @@ class RecursoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recurso
         fields = "__all__"
+
