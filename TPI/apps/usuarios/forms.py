@@ -1,48 +1,56 @@
+from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import Usuario 
-from apps.recursos.models import Institucion # Importa el modelo Institucion
-from django import forms # Necesitas esto para ModelChoiceField
+from apps.recursos.models import Institucion
 
 class CustomUserCreationForm(UserCreationForm):
-    # 1. Creamos un campo para la institución usando ModelChoiceField
+    
+    # Definimos el campo de institución aquí
     institucion_asignada = forms.ModelChoiceField(
         queryset=Institucion.objects.all(),
-        required=False, # No es requerido aquí, será condicionalmente requerido por JS
+        required=False,
         label="Institución de Afiliación",
-        # El widget se renderizará como un <select>
+    )
+    
+    # Definimos el campo de rol aquí
+    rol = forms.ChoiceField(
+        choices=Usuario.rol.field.choices,
+        label='Rol de Usuario',
+        required=True
     )
 
     class Meta:
         model = Usuario
-        # Incluimos el nuevo campo en la lista de campos.
-        # Quitamos 'rol' del 'fields' de la clase Meta, ya que lo vamos a inyectar con JS
-        fields = ('email', 'nombre', 'apellido') # Dejamos solo los campos base, rol y recurso van por JS/custom
-        
+        # El formulario manejará estos campos del modelo
+        fields = ('email', 'nombre', 'apellido', 'rol', 'institucion_asignada')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # 2. Re-agregamos el campo 'rol' como ChoiceField para tener el desplegable.
-        # Aunque el campo 'rol' está en el modelo, lo definimos aquí para tener control.
-        self.fields['rol'] = forms.ChoiceField(
-            choices=Usuario.rol.field.choices,
-            label='Rol de Usuario',
-            required=True
-        )
+        # --- ESTA ES LA SOLUCIÓN AL DISEÑO ---
+        # Definimos la clase de Tailwind que queremos aplicar
+        tailwind_class = 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 mt-1'
 
-    # 3. Guardamos el campo de institución en la instancia de Usuario si existe en los datos
+        # Iteramos sobre todos los campos y aplicamos la clase
+        # Esto funciona para <input> y <select>
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs.update({'class': tailwind_class})
+        
+        # --- SOLUCIÓN AL ORDEN ---
+        # Forzamos el orden correcto de los campos
+        self.field_order = ['email', 'nombre', 'apellido', 'rol', 'institucion_asignada']
+
     def save(self, commit=True):
         user = super().save(commit=False)
         
-        # La Institución ya viene en cleaned_data, la asignamos
-        institucion = self.cleaned_data.get('institucion_asignada')
-        
-        # Asignamos el rol, que viene de la data
+        # Asignamos los campos personalizados
         user.rol = self.cleaned_data.get('rol')
+        institucion = self.cleaned_data.get('institucion_asignada')
         
         if user.rol == 'usuario' and institucion:
             user.institucion_asignada = institucion
-        elif user.rol != 'usuario':
-            user.institucion_asignada = None # Aseguramos que no tenga institución si no es usuario
+        else:
+            user.institucion_asignada = None 
 
         if commit:
             user.save()
