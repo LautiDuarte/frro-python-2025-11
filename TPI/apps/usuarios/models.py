@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, Group, Permission
+# Importamos el modelo Recurso. Asegúrate de que esta ruta sea correcta para tu proyecto.
+from apps.recursos.models import Institucion
 
 class UsuarioManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -14,6 +16,7 @@ class UsuarioManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("rol", "admin") # Aseguramos que el superusuario sea admin
         return self.create_user(email, password, **extra_fields)
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
@@ -29,17 +32,29 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    # Redefinimos groups y user_permissions para evitar conflictos
+    # ----------------------------------------------------
+    # CAMBIO CLAVE: Relación 1 a 0/1 con INSTITUCION
+    # ----------------------------------------------------
+    institucion_asignada = models.ForeignKey(
+        'recursos.Institucion', # <--- USA ESTA CADENA
+        on_delete=models.SET_NULL, 
+        related_name='usuarios_afiliados',
+        null=True,                 
+        blank=True                 
+    )
+    # ----------------------------------------------------
+
+    # Redefinimos groups y user_permissions (mantenemos tu código)
     groups = models.ManyToManyField(
         Group,
-        related_name="usuarios_usuario_groups",  # nombre único
+        related_name="usuarios_usuario_groups",
         blank=True,
         help_text="Grupos a los que pertenece el usuario",
         verbose_name="grupos"
     )
     user_permissions = models.ManyToManyField(
         Permission,
-        related_name="usuarios_usuario_permissions",  # nombre único
+        related_name="usuarios_usuario_permissions",
         blank=True,
         help_text="Permisos específicos del usuario",
         verbose_name="permisos de usuario"
@@ -48,7 +63,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     objects = UsuarioManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["nombre", "apellido"]
+    REQUIRED_FIELDS = ["nombre", "apellido", "rol"] # Añadí 'rol' para asegurar que se pida al crear
     EMAIL_FIELD = "email"
 
     def __str__(self):

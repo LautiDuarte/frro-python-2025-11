@@ -14,13 +14,50 @@
 </head>
 <body>
 
-    <form method="post">
-        <h2>Crear Cuenta Nueva</h2>
+<form method="post">
+    <h2>Crear Cuenta Nueva</h2>
+    
+    {% csrf_token %}
+    
+    {% for field in form %}
+        <p>
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}<span class="text-xs text-gray-500">{{ field.help_text }}</span>{% endif %}
+            {% if field.errors %}<div class="errorlist">{{ field.errors }}</div>{% endif %}
+        </p>
+    {% endfor %}
+    
+    <button type="submit">Registrarse</button>
+</form>
 
-        {% csrf_token %} {{ form.as_p }}
+<script>
+    const rolField = document.getElementById('id_rol');
+    const institucionFieldContainer = document.querySelector('label[for="id_institucion_asignada"]').parentNode;
 
-        <button type="submit">Registrarse</button>
-    </form>
+    // Inicialmente ocultar el campo de institución
+    institucionFieldContainer.style.display = 'none';
+
+    function toggleInstitucionField() {
+        // Obtenemos el valor seleccionado
+        if (rolField.value === 'usuario') {
+            institucionFieldContainer.style.display = 'block';
+            // Opcional: Podrías añadir validación aquí (si se requiere)
+        } else {
+            institucionFieldContainer.style.display = 'none';
+        }
+    }
+
+    // Ejecutar al cargar la página
+    toggleInstitucionField();
+
+    // Ejecutar al cambiar el valor del Rol
+    rolField.addEventListener('change', toggleInstitucionField);
+
+    /* --- NOTA: AJAX no es estrictamente necesario aquí porque Django's ModelChoiceField 
+            ya hace el GET de todas las instituciones por ti en el backend. --- */
+
+</script>
 
 </body>
 </html>

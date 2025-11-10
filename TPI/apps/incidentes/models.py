@@ -24,7 +24,11 @@ class Incidente(models.Model):
 
 class Asignacion(models.Model):
     incidente = models.ForeignKey(Incidente, on_delete=models.CASCADE, related_name="asignaciones")
-    recurso = models.ForeignKey("recursos.Recurso", on_delete=models.CASCADE, related_name="asignaciones")
+    recurso = models.ForeignKey(
+        "recursos.Recurso", 
+        on_delete=models.CASCADE, 
+        related_name="asignaciones_recurso" # <-- Cambiado a un nombre único
+    )
     tiempo_estimado_llegada = models.IntegerField()
     fecha_hora_inicio = models.DateTimeField()
     fecha_hora_fin = models.DateTimeField(null=True, blank=True)

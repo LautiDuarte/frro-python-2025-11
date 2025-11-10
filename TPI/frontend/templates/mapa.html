@@ -8,7 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
     <style>
+        /* Estilos generales */
         #map {
             height: 100vh;
             width: 100%;
@@ -18,6 +22,7 @@
             z-index: 1000;
         }
 
+        /* Estilos del Sidebar */
         .sidebar {
             height: 100%;
             width: 250px;
@@ -56,17 +61,27 @@
             background-color: gray !important;
             cursor: not-allowed;
         }
+        
+        /* Estilos para la tabla (Rol Usuario) */
+        .styled-table th, .styled-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .styled-table th {
+            background-color: #e9ecef;
+            color: #333;
+        }
     </style>
 </head>
 
 <body class="bg-gray-100 flex flex-col h-screen">
 
-    <!-- Header -->
-    <header class="bg-blue-600 text-white p-4 flex justify-between items-center relative">
-        <h1 class="text-lg font-bold">Mapa de Incidentes</h1>
+    {% if rol == 'operador' %}
+        
         <div id="mySidebar" class="sidebar">
             <h3 style="padding: 15px 25px; border-bottom: 1px solid #555;">Menú Principal</h3>
-
+            
             <form id="logoutForm" method="post" action="{% url 'logout' %}" style="display: none;">
                 {% csrf_token %}
             </form>
@@ -78,202 +93,250 @@
             <a href="#">Incidentes Pendientes</a>
             <a href="#">Mi Perfil</a>
         </div>
-    </header>
 
-    <!-- Mapa -->
-    <div id="map"></div>
+        <header class="bg-blue-600 text-white p-4 flex justify-between items-center relative">
+            <h1 class="text-lg font-bold">Mapa de Incidentes</h1>
+            </header>
 
-    <div style="position: fixed; top: 100px; right: 20px; z-index: 1000;">
-        <button id="btnNuevoIncidente" disabled
-            style="padding: 10px 20px; background-color: gray; color: white; border: none; border-radius: 5px; cursor: not-allowed;">
-            Reportar Incidente 🚨
-        </button>
-    </div>
+        <div id="map"></div>
 
-    <!-- Modal Crear Incidente -->
-    <div id="modalIncidente"
-        class="fixed hidden inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[5000]">
-        <div class="bg-white p-6 rounded-lg w-96 shadow-lg">
-            <h2 class="text-lg font-bold mb-4">Nuevo Incidente</h2>
-            <form id="formIncidente">
-                <label class="block mb-2">Título:</label>
-                <input type="text" id="titulo" class="w-full border p-2 mb-3 rounded" required>
-
-                <label class="block mb-2">Detalle:</label>
-                <textarea id="detalle" class="w-full border p-2 mb-3 rounded" rows="3" required></textarea>
-
-                <label class="block mb-2">Gravedad:</label>
-                <select id="gravedad" class="w-full border p-2 mb-3 rounded">
-                    <option value="1">1 - Leve</option>
-                    <option value="2">2 - Moderada</option>
-                    <option value="3">3 - Grave</option>
-                </select>
-
-                <label class="block mb-2">Tipo de incidente:</label>
-                <select id="tipo" class="w-full border p-2 mb-3 rounded"></select>
-
-                <div class="flex justify-between mt-4">
-                    <button type="button" id="cancelar"
-                        class="bg-gray-400 text-white px-4 py-2 rounded">Cancelar</button>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Guardar</button>
-                </div>
-            </form>
+        <div style="position: fixed; top: 100px; right: 20px; z-index: 3000;">
+            <button id="btnNuevoIncidente" disabled
+                style="padding: 10px 20px; background-color: gray; color: white; border: none; border-radius: 5px; cursor: not-allowed;">
+                Reportar Incidente 🚨
+            </button>
         </div>
-    </div>
 
-    <!-- Scripts -->
-    <script>
-        const map = L.map('map').setView([-32.9587, -60.6939], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+        <div id="modalIncidente"
+            class="fixed hidden inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[5000]">
+            <div class="bg-white p-6 rounded-lg w-96 shadow-lg">
+                <h2 class="text-lg font-bold mb-4">Nuevo Incidente</h2>
+                
+                <form id="formIncidente">
+                    <label class="block mb-2">Título:</label>
+                    <input type="text" id="titulo" class="w-full border p-2 mb-3 rounded" required>
+    
+                    <label class="block mb-2">Detalle:</label>
+                    <textarea id="detalle" class="w-full border p-2 mb-3 rounded" rows="3" required></textarea>
+    
+                    <label class="block mb-2">Gravedad:</label>
+                    <select id="gravedad" class="w-full border p-2 mb-3 rounded">
+                        <option value="1">1 - Leve</option>
+                        <option value="2">2 - Moderada</option>
+                        <option value="3">3 - Grave</option>
+                    </select>
+    
+                    <label class="block mb-2">Tipo de incidente:</label>
+                    <select id="tipo" class="w-full border p-2 mb-3 rounded"></select>
+    
+                    <div class="flex justify-between mt-4">
+                        <button type="button" id="cancelar"
+                            class="bg-gray-400 text-white px-4 py-2 rounded">Cancelar</button>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-        const btnNuevoIncidente = document.getElementById('btnNuevoIncidente');
+        <script>
+            // ... [TODO TU CÓDIGO JAVASCRIPT VA AQUÍ, TAL CUAL LO TENÍAS] ...
+            
+            // MAP INITIALIZATION
+            const map = L.map('map').setView([-32.9587, -60.6939], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
 
-        // -----------------------
-        // Mostrar incidentes existentes
-        // -----------------------
-        function cargarIncidentes() {
-            fetch('/api/incidentes/')
-                .then(res => res.json())
-                .then(data => {
-                    data.forEach(i => {
-                        if (i.latitud && i.longitud) {
-                            const marker = L.marker([i.latitud, i.longitud]).addTo(map);
-                            marker.bindPopup(`
-                                <strong>${i.titulo}</strong><br>
-                                ${i.detalle}<br>
-                                <em>Gravedad: ${i.gravedad}</em><br>
-                                Estado: ${i.estado}
-                            `);
+            const btnNuevoIncidente = document.getElementById('btnNuevoIncidente');
+
+            // -----------------------
+            // Mostrar incidentes existentes (Fetch a la API)
+            // -----------------------
+            function cargarIncidentes() {
+                fetch('/api/incidentes/')
+                    .then(res => res.json())
+                    .then(data => {
+                        data.forEach(i => {
+                            if (i.latitud && i.longitud) {
+                                const marker = L.marker([i.latitud, i.longitud]).addTo(map);
+                                marker.bindPopup(`
+                                    <strong>${i.titulo}</strong><br>
+                                    ${i.detalle}<br>
+                                    <em>Gravedad: ${i.gravedad}</em><br>
+                                    Estado: ${i.estado}
+                                `);
+                            }
+                        });
+                    });
+            }
+            cargarIncidentes();
+
+            // -----------------------
+            // Control de selección de ubicación, Modal, y CRUD (Tu código JS)
+            // -----------------------
+
+            map.on('click', e => {
+                if (window.tempMarker) map.removeLayer(window.tempMarker);
+                window.tempMarker = L.marker(e.latlng).addTo(map);
+                window.latitudSeleccionada = e.latlng.lat;
+                window.longitudSeleccionada = e.latlng.lng;
+
+                // Habilitar botón al seleccionar ubicación
+                btnNuevoIncidente.disabled = false;
+                btnNuevoIncidente.style.backgroundColor = '#007bff';
+                btnNuevoIncidente.style.cursor = 'pointer';
+            });
+
+            // Lógica del Modal (abrir/cerrar/limpiar)
+            const modal = document.getElementById('modalIncidente');
+            const cancelarBtn = document.getElementById('cancelar');
+            const form = document.getElementById('formIncidente');
+
+            btnNuevoIncidente.addEventListener('click', () => {
+                limpiarFormulario();
+                modal.classList.remove('hidden');
+                cargarTiposIncidente();
+            });
+
+            cancelarBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                limpiarFormulario();
+            });
+
+            function limpiarFormulario() {
+                form.reset();
+            }
+
+            // Cargar tipos de incidente
+            function cargarTiposIncidente() {
+                fetch('/api/tipos-incidentes/')
+                    .then(res => res.json())
+                    .then(data => {
+                        const select = document.getElementById('tipo');
+                        select.innerHTML = '';
+                        data.forEach(t => {
+                            select.innerHTML += `<option value="${t.id}">${t.nombre}</option>`;
+                        });
+                    });
+            }
+
+            // Crear incidente (Submit)
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+
+                const datos = {
+                    titulo: document.getElementById('titulo').value,
+                    detalle: document.getElementById('detalle').value,
+                    gravedad: parseInt(document.getElementById('gravedad').value),
+                    estado: 'Activo',
+                    latitud: window.latitudSeleccionada,
+                    longitud: window.longitudSeleccionada,
+                    tipo: parseInt(document.getElementById('tipo').value)
+                };
+
+                fetch('/api/incidentes/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(datos)
+                })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Error al crear incidente');
+                        return res.json();
+                    })
+                    .then(() => {
+                        alert('Incidente creado correctamente');
+                        modal.classList.add('hidden');
+                        limpiarFormulario();
+                        // Recargar marcadores y limpiar estado
+                        map.eachLayer(layer => {
+                            if (layer instanceof L.Marker) map.removeLayer(layer);
+                        });
+                        cargarIncidentes();
+
+                        btnNuevoIncidente.disabled = true;
+                        btnNuevoIncidente.style.backgroundColor = 'gray';
+                        btnNuevoIncidente.style.cursor = 'not-allowed';
+                        window.latitudSeleccionada = null;
+                        window.longitudSeleccionada = null;
+                        if (window.tempMarker) {
+                            map.removeLayer(window.tempMarker);
+                            window.tempMarker = null;
                         }
-                    });
-                });
-        }
-        cargarIncidentes();
+                    })
+                    .catch(err => alert(err));
+            });
 
-        // -----------------------
-        // Control de selección de ubicación
-        // -----------------------
-        map.on('click', e => {
-            if (window.tempMarker) map.removeLayer(window.tempMarker);
-            window.tempMarker = L.marker(e.latlng).addTo(map);
-            window.latitudSeleccionada = e.latlng.lat;
-            window.longitudSeleccionada = e.latlng.lng;
-
-            // ✅ Habilitar botón al seleccionar ubicación
-            btnNuevoIncidente.disabled = false;
-            btnNuevoIncidente.style.backgroundColor = '#007bff';
-            btnNuevoIncidente.style.cursor = 'pointer';
-        });
-
-        // -----------------------
-        // Modal de creación
-        // -----------------------
-        const modal = document.getElementById('modalIncidente');
-        const cancelarBtn = document.getElementById('cancelar');
-        const form = document.getElementById('formIncidente');
-
-        btnNuevoIncidente.addEventListener('click', () => {
-            limpiarFormulario();
-            modal.classList.remove('hidden');
-            cargarTiposIncidente();
-        });
-
-        cancelarBtn.addEventListener('click', () => {
-            modal.classList.add('hidden');
-            limpiarFormulario();
-        });
-
-        function limpiarFormulario() {
-            form.reset();
-        }
-
-        // -----------------------
-        // Cargar tipos de incidente
-        // -----------------------
-        function cargarTiposIncidente() {
-            fetch('/api/tipos-incidentes/')
-                .then(res => res.json())
-                .then(data => {
-                    const select = document.getElementById('tipo');
-                    select.innerHTML = '';
-                    data.forEach(t => {
-                        select.innerHTML += `<option value="${t.id}">${t.nombre}</option>`;
-                    });
-                });
-        }
-
-        // -----------------------
-        // Crear incidente
-        // -----------------------
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-
-            const datos = {
-                titulo: document.getElementById('titulo').value,
-                detalle: document.getElementById('detalle').value,
-                gravedad: parseInt(document.getElementById('gravedad').value),
-                estado: 'Activo',
-                latitud: window.latitudSeleccionada,
-                longitud: window.longitudSeleccionada,
-                tipo: parseInt(document.getElementById('tipo').value)
-            };
-
-            fetch('/api/incidentes/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify(datos)
-            })
-                .then(res => {
-                    if (!res.ok) throw new Error('Error al crear incidente');
-                    return res.json();
-                })
-                .then(() => {
-                    alert('Incidente creado correctamente');
-                    modal.classList.add('hidden');
-                    limpiarFormulario();
-                    // recargar marcadores
-                    map.eachLayer(layer => {
-                        if (layer instanceof L.Marker) map.removeLayer(layer);
-                    });
-                    cargarIncidentes();
-
-                    // volver a deshabilitar el botón hasta nueva selección
-                    btnNuevoIncidente.disabled = true;
-                    btnNuevoIncidente.style.backgroundColor = 'gray';
-                    btnNuevoIncidente.style.cursor = 'not-allowed';
-                    window.latitudSeleccionada = null;
-                    window.longitudSeleccionada = null;
-                    if (window.tempMarker) {
-                        map.removeLayer(window.tempMarker);
-                        window.tempMarker = null;
-                    }
-                })
-                .catch(err => alert(err));
-        });
-
-        // -----------------------
-        // CSRF helper
-        // -----------------------
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let cookie of cookies) {
-                    cookie = cookie.trim();
-                    if (cookie.startsWith(name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
+            // CSRF helper
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let cookie of cookies) {
+                        cookie = cookie.trim();
+                        if (cookie.startsWith(name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
                     }
                 }
+                return cookieValue;
             }
-            return cookieValue;
-        }
-    </script>
+        </script>
+        
+    {% elif rol == 'usuario' %}
+        
+        <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
+            <h1 class="text-lg font-bold">Mis Incidentes Asignados</h1>
+            <form id="logoutFormUser" method="post" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-500 hover:bg-red-700 px-3 py-1 rounded">Cerrar Sesión</button>
+            </form>
+        </header>
+
+        <div class="p-8 overflow-y-auto">
+            {% if incidentes_asignados %}
+                <table class="w-full bg-white styled-table shadow-lg rounded-lg">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Detalle</th>
+                            <th>Gravedad</th>
+                            <th>Estado</th>
+                            <th>Fecha/Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for incidente in incidentes_asignados %}
+                        <tr>
+                            <td>{{ incidente.id }}</td>
+                            <td class="font-medium">{{ incidente.detalle }}</td>
+                            <td>{{ incidente.gravedad }}</td>
+                            <td><span class="px-2 py-1 rounded text-xs font-semibold 
+                                {% if incidente.estado == 'PENDIENTE' %} bg-yellow-100 text-yellow-800
+                                {% elif incidente.estado == 'ASIGNADO' %} bg-blue-100 text-blue-800
+                                {% else %} bg-gray-100 text-gray-800
+                                {% endif %}">
+                                {{ incidente.estado }}
+                            </span></td>
+                            <td>{{ incidente.fechaHora | date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="mt-4 p-4 bg-white rounded shadow text-gray-600">
+                    🎉 ¡Felicidades! No tienes incidentes pendientes o asignados en este momento.
+                </p>
+            {% endif %}
+        </div>
+
+    {% else %}
+        <p>Acceso Denegado. Redirigiendo...</p>
+        <script>window.location.href = "{% url 'logout' %}";</script>
+    {% endif %}
 
 </body>
 
