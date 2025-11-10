@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Incidentes Asignados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .styled-table th, .styled-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .styled-table th {
+            background-color: #e9ecef;
+            color: #333;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
+        <h1 class="text-lg font-bold">Mis Incidentes Asignados</h1>
+        <form id="logoutFormUser" method="post" action="{% url 'logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-500 hover:bg-red-700 px-3 py-1 rounded">Cerrar Sesión</button>
+        </form>
+    </header>
+
+    <div class="p-8 overflow-y-auto">
+        {% if incidentes_asignados %}
+            <table class="w-full bg-white styled-table shadow-lg rounded-lg">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Detalle</th>
+                        <th>Gravedad</th>
+                        <th>Estado</th>
+                        <th>Fecha/Hora</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for incidente in incidentes_asignados %}
+                    <tr>
+                        <td>{{ incidente.id }}</td>
+                        <td class="font-medium">{{ incidente.detalle }}</td>
+                        <td>{{ incidente.gravedad }}</td>
+                        <td><span class="px-2 py-1 rounded text-xs font-semibold 
+                            {% if incidente.estado == 'PENDIENTE' %} bg-yellow-100 text-yellow-800
+                            {% elif incidente.estado == 'ASIGNADO' %} bg-blue-100 text-blue-800
+                            {% else %} bg-gray-100 text-gray-800
+                            {% endif %}">
+                            {{ incidente.estado }}
+                        </span></td>
+                        <td>{{ incidente.fechaHora | date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="mt-4 p-4 bg-white rounded shadow text-gray-600">
+                No tienes incidentes pendientes o asignados en este momento.
+            </p>
+        {% endif %}
+    </div>
+
+<div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">
+        <i class="fas fa-ambulance text-blue-500"></i>
+        Nuestra Flota (Recursos)
+    </h2>
+    
+    {% if recursos_asignados %}
+        <div class="space-y-4">
+            {% for recurso in recursos_asignados %}
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                    <span class="font-medium text-gray-700">Recurso #{{ recurso.id }}</span>
+                    
+                    {% if recurso.estado|lower == 'disponible' %}
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                            <i class="fas fa-check-circle"></i> Disponible
+                        </span>
+                    {% else %}
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">
+                            <i class="fas fa-exclamation-triangle"></i> {{ recurso.estado }}
+                        </span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-500">No hay recursos asignados a esta institución.</p>
+    {% endif %}
+</div>
+
+
+</body>
+</html>

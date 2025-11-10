@@ -156,6 +156,8 @@ REST_FRAMEWORK = {
     ]
 }
 
-LOGIN_REDIRECT_URL = '/mapa/'
+LOGIN_REDIRECT_URL = 'index'
 
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'login'
+
+LOGIN_URL = 'login'

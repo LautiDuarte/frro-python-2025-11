@@ -1,49 +1,139 @@
-from django.shortcuts import render
-from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic
 from apps.usuarios.forms import CustomUserCreationForm
-from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from apps.incidentes.forms import ReporteIncidenteForm # Importa el formulario
+from apps.incidentes.forms import ReporteIncidenteForm
+from django.contrib import messages
+from apps.incidentes.models import Incidente
+from apps.recursos.models import Recurso
 
-@login_required
-def mapa(request):
-    return render(request, "mapa.html")
 
-
+# Vista de registro usando el formulario personalizado
 class SignUpView(generic.CreateView):
-    # ¡Ahora usa el formulario personalizado!
     form_class = CustomUserCreationForm 
     success_url = reverse_lazy('login')
     template_name = 'registration/register.html'
 
 
-@login_required # Solo permite acceso si el operario está logueado
+@login_required 
+def index(request):
+    """
+    Router principal después del login. Decide a dónde enviar al usuario según su rol.
+    """
+    rol_usuario = request.user.rol.lower()
+
+    # Si es USUARIO (Hospital), lo enviamos a la vista que solo muestra la tabla.
+    if rol_usuario == 'usuario':
+        return redirect('incidentes_asignados') 
+
+    # Si es OPERADOR, lo enviamos a la vista que gestiona el mapa.
+    if rol_usuario == 'operador':
+        return redirect('mapa')
+        
+    # Si el rol no es ninguno de los anteriores
+    messages.error(request, "No tienes permisos para acceder a esta página.")
+    return redirect('logout')
+
+
+@login_required 
 def mapa(request):
-    # Si el método es POST, el formulario fue enviado
+    """
+    Vista que maneja la lógica del mapa (Operador).
+    """
+    rol_usuario = request.user.rol.lower()
+    
+    if rol_usuario != 'operador':
+        return redirect('index')
+
+    # 1. Manejar el reporte de incidente (POST)
     if request.method == 'POST':
         form = ReporteIncidenteForm(request.POST)
-        
         if form.is_valid():
-            # 1. Guardar el incidente (pero no lo comiteamos a la DB todavía)
             incidente = form.save(commit=False)
-            
-            # 2. Asignar campos que el usuario NO llenó (como el que reporta)
-            #    Asumo que el modelo Incidente tiene un campo 'reporta' relacionado a Usuario
-            #    y campos por defecto para 'estado' y 'fechaHora'
             incidente.reporta = request.user 
-            incidente.estado = 'PENDIENTE' # Estado inicial por defecto
-            incidente.save() # Ahora sí, guardar en la base de datos
-            
-            # Redirigir de vuelta al mapa
+            incidente.estado = 'PENDIENTE' 
+            incidente.save() 
+            messages.success(request, "¡Incidente reportado con éxito!")
             return redirect('mapa') 
-            
-    # Si el método es GET (o el POST fue inválido), mostramos la página con el formulario vacío
+        else:
+            # Si el formulario no es válido, lo volvemos a mostrar con errores
+            context = {
+                'rol': rol_usuario,
+                'form': form,
+                'incidentes_mapa': Incidente.objects.all()
+            }
+            return render(request, 'mapa.html', context)
     else:
         form = ReporteIncidenteForm()
 
+    # 2. Mostrar la página (GET)
     context = {
+        'rol': rol_usuario,
         'form': form,
+        'incidentes_mapa': Incidente.objects.all() # El operador ve todos los incidentes
     }
     return render(request, 'mapa.html', context)
+
+# En frontend/views.py
+
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from django.views import generic
+from apps.usuarios.forms import CustomUserCreationForm
+from django.contrib.auth.decorators import login_required
+from apps.incidentes.forms import ReporteIncidenteForm
+from django.contrib import messages
+from apps.incidentes.models import Incidente
+# --- IMPORTACIONES ADICIONALES NECESARIAS ---
+from apps.recursos.models import Recurso # Para listar los recursos
+
+
+# ... (AQUÍ VAN TUS OTRAS VISTAS: SignUpView, index, mapa) ...
+
+
+@login_required
+def incidentes_asignados(request):
+    """
+    Vista exclusiva para el rol 'usuario' (Hospital/Institucion).
+    Muestra los RECURSOS de su institución y los INCIDENTES asignados a esos recursos.
+    """
+    if request.user.rol.lower() != 'usuario':
+        messages.error(request, "Acceso no autorizado.")
+        return redirect('logout')
+        
+    # 1. Obtener la institución del usuario (Hospital)
+    institucion_del_usuario = getattr(request.user, 'institucion_asignada', None)
+    
+    # Inicializar QuerySets vacíos
+    recursos_de_la_institucion = Recurso.objects.none()
+    incidentes_asignados = Incidente.objects.none()
+    institucion_nombre_str = "Sin Institución Asignada"
+
+    if institucion_del_usuario:
+        institucion_nombre_str = institucion_del_usuario.nombre
+        
+        # 2. (Requerimiento 1) Obtener todos los RECURSOS (ambulancias)
+        recursos_de_la_institucion = Recurso.objects.filter(
+            institucion_base=institucion_del_usuario
+        ).order_by('estado') # Ordenar por estado
+        
+        # 3. (Requerimiento 2) Obtener los INCIDENTES asignados a ESOS recursos
+        try:
+            # Usamos el related_name "asignaciones" que definiste en el modelo Asignacion
+            incidentes_asignados = Incidente.objects.filter(
+                asignaciones__recurso__institucion_base=institucion_del_usuario,
+                estado__in=['ASIGNADO', 'PENDIENTE', 'ACTIVO'] # Estados relevantes
+            ).distinct().order_by('-fecha_hora') # Ordenar por más reciente
+            
+        except Exception as e:
+             messages.error(request, f"Error crítico al consultar la base de datos: {e}")
+    
+    context = {
+        'rol': request.user.rol.lower(),
+        'institucion_nombre': institucion_nombre_str,
+        'recursos_asignados': recursos_de_la_institucion, # Lista de Recursos
+        'incidentes_asignados': incidentes_asignados, # Lista de Incidentes
+    }
+    
+    return render(request, 'usuario_incidentes.html', context)
