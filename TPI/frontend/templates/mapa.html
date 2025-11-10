@@ -152,6 +152,51 @@
         }
         cargarIncidentes();
 
+        function cargarInstituciones() {
+            fetch('/api/tipos-recursos/')
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(inst => {
+                        if (inst.latitud && inst.longitud) {
+
+                            const iconoInstitucion = L.icon({
+                                iconUrl: obtenerIconoPorTipo(inst.tipo),
+                                iconSize: [32, 32],
+                                iconAnchor: [16, 32],
+                                popupAnchor: [0, -28]
+                            });
+
+                            const marker = L.marker([inst.latitud, inst.longitud], { icon: iconoInstitucion }).addTo(map);
+                            marker.bindPopup(`
+                        <strong>${inst.nombre}</strong><br>
+                        <em>Centro de atención de emergencias</em>
+                    `);
+                        }
+                    });
+                });
+        }
+
+        // -----------------------
+        // Determinar ícono según tipo de institución
+        // -----------------------
+        const ICONO_HOSPITAL = "{% static 'icons/hospital.svg' %}";
+        const ICONO_BOMBERO = "{% static 'icons/bombero.svg' %}";
+        const ICONO_POLICIA = "{% static 'icons/policia.svg' %}";
+
+        function obtenerIconoPorTipo(tipo) {
+            const lower = tipo.toLowerCase();
+            if (lower.includes('hospital')) {
+                return ICONO_HOSPITAL;
+            } else if (lower.includes('cuartel')) {
+                return ICONO_BOMBERO;
+            } else if (lower.includes('comisaria')) {
+                return ICONO_POLICIA;
+            } else {
+                return '';
+            }
+        }
+        cargarInstituciones();
+
         // -----------------------
         // Control de selección de ubicación
         // -----------------------
