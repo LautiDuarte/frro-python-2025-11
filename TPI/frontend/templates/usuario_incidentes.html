@@ -90,21 +90,20 @@
                     <i class="fas fa-ambulance text-blue-500"></i>
                     Nuestra Flota (Recursos)
                 </h2>
-    <form method="POST" class="bg-gray-50 p-4 rounded mb-4">
-        {% csrf_token %}
-        <div class="space-y-2">
-            {{ form_recurso.tipo_recurso }}
-        </div>
-        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded w-full mt-3">
-            + Agregar Recurso
-        </button>
-    </form>
-                
+                <form method="POST" class="bg-gray-50 p-4 rounded mb-4">
+                    {% csrf_token %}
+                    <div class="space-y-2">
+                        {{ form_recurso.tipo_recurso }}
+                    </div>
+                    <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded w-full mt-3">
+                        + Agregar Recurso
+                    </button>
+                </form>
                 {% if recursos_asignados %}
                     <div class="space-y-4">
                         {% for recurso in recursos_asignados %}
                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
-            <span class="font-medium text-gray-700">#{{ recurso.id }} - {{ recurso.tipo_recurso.nombre }}</span>
+                                <span class="font-medium text-gray-700">#{{ recurso.id }} - {{ recurso.tipo_recurso.nombre }}</span>
                                 
                                 {% if recurso.estado|lower == 'disponible' %}
                                     <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
@@ -115,8 +114,9 @@
                                         <i class="fas fa-exclamation-triangle"></i> {{ recurso.estado }}
                                     </span>
                                 {% endif %}
-            <a href="?eliminar_recurso={{ recurso.id }}" class="text-red-600 hover:text-red-800 font-bold text-lg"
-                onclick="return confirm('¿Seguro que querés eliminar este recurso?');">🗑️</a>
+                                
+                                <a href="?eliminar_recurso={{ recurso.id }}" class="text-red-600 hover:text-red-800 font-bold text-lg"
+                                    onclick="return confirm('¿Seguro que querés eliminar este recurso?');">🗑️</a>
                             </div>
                         {% endfor %}
                     </div>
