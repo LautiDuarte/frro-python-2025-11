@@ -126,8 +126,8 @@
                         <option value="3">3 - Grave</option>
                     </select>
     
-                    <label class="block mb-2">Tipo de incidente:</label>
-                    <select id="tipo" class="w-full border p-2 mb-3 rounded"></select>
+                    <label class="block mb-2">Tipo de recurso que necesita:</label>
+                    <select id="tipo_recurso" class="w-full border p-2 mb-3 rounded"></select>
     
                     <div class="flex justify-between mt-4">
                         <button type="button" id="cancelar"
@@ -172,7 +172,7 @@
             cargarIncidentes();
 
         function cargarInstituciones() {
-            fetch('/api/tipos-recursos/')
+            fetch('/api/instituciones/')
                 .then(res => res.json())
                 .then(data => {
                     data.forEach(inst => {
@@ -239,7 +239,7 @@
             btnNuevoIncidente.addEventListener('click', () => {
                 limpiarFormulario();
                 modal.classList.remove('hidden');
-                cargarTiposIncidente();
+                cargarTiposRecursos();
             });
 
             cancelarBtn.addEventListener('click', () => {
@@ -252,11 +252,11 @@
             }
 
             // Cargar tipos de incidente
-            function cargarTiposIncidente() {
-                fetch('/api/tipos-incidentes/')
+            function cargarTiposRecursos() {
+                fetch('/api/tipos-recursos/')
                     .then(res => res.json())
                     .then(data => {
-                        const select = document.getElementById('tipo');
+                        const select = document.getElementById('tipo_recurso');
                         select.innerHTML = '';
                         data.forEach(t => {
                             select.innerHTML += `<option value="${t.id}">${t.nombre}</option>`;
@@ -275,7 +275,7 @@
                     estado: 'Activo',
                     latitud: window.latitudSeleccionada,
                     longitud: window.longitudSeleccionada,
-                    tipo: parseInt(document.getElementById('tipo').value)
+                    tipo_recurso: parseInt(document.getElementById('tipo_recurso').value)
                 };
 
                 fetch('/api/incidentes/', {

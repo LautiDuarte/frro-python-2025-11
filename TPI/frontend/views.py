@@ -1,6 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
+from apps.recursos.forms import RecursoForm
 from apps.usuarios.forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
 from apps.incidentes.forms import ReporteIncidenteForm
@@ -104,7 +105,30 @@ def incidentes_asignados(request):
         
     # 1. Obtener la institución del usuario (Hospital)
     institucion_del_usuario = getattr(request.user, 'institucion_asignada', None)
+    if not institucion_del_usuario:
+        messages.error(request, "Tu usuario no tiene una institución asignada.")
+        return redirect('logout')
     
+    if request.method == 'POST':
+        form_recurso = RecursoForm(request.POST)
+        if form_recurso.is_valid():
+            nuevo_recurso = form_recurso.save(commit=False)
+            nuevo_recurso.institucion_base = institucion_del_usuario
+            nuevo_recurso.estado = 'DISPONIBLE'  # Estado inicial por defecto
+            nuevo_recurso.save()
+            messages.success(request, "✅ Recurso creado con éxito.")
+            return redirect('incidentes_asignados')
+        else:
+            messages.error(request, "❌ Error al crear el recurso. Verifique los datos.")
+    elif 'eliminar_recurso' in request.GET:
+        recurso_id = request.GET.get('eliminar_recurso')
+        recurso = get_object_or_404(Recurso, id=recurso_id, institucion_base=institucion_del_usuario)
+        recurso.delete()
+        messages.success(request, "🗑️ Recurso eliminado correctamente.")
+        return redirect('incidentes_asignados')
+    else:
+        form_recurso = RecursoForm()
+
     # Inicializar QuerySets vacíos
     recursos_de_la_institucion = Recurso.objects.none()
     incidentes_asignados = Incidente.objects.none()
@@ -134,6 +158,7 @@ def incidentes_asignados(request):
         'institucion_nombre': institucion_nombre_str,
         'recursos_asignados': recursos_de_la_institucion, # Lista de Recursos
         'incidentes_asignados': incidentes_asignados, # Lista de Incidentes
+        'form_recurso': form_recurso,
     }
     
     return render(request, 'usuario_incidentes.html', context)

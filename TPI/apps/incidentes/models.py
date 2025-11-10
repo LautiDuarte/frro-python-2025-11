@@ -1,11 +1,7 @@
 from django.db import models
 from apps.usuarios.models import Usuario
+from apps.recursos.models import TipoRecurso
 
-class TipoIncidente(models.Model):
-    nombre = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.nombre
 
 class Incidente(models.Model):
     titulo = models.CharField(max_length=100, default=None)
@@ -16,12 +12,11 @@ class Incidente(models.Model):
     estado = models.CharField(max_length=20)
     fecha_hora = models.DateTimeField(auto_now_add=True)
 
-    tipo = models.ForeignKey(TipoIncidente, on_delete=models.CASCADE)
+    tipo_recurso = models.ForeignKey(TipoRecurso, on_delete=models.CASCADE)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="incidentes")
 
     def __str__(self):
-        return f"Incidente {self.id} - {self.tipo.nombre}"
-
+        return f"Incidente {self.id} - {self.tipo_recurso.nombre}"
 class Asignacion(models.Model):
     incidente = models.ForeignKey(Incidente, on_delete=models.CASCADE, related_name="asignaciones")
     recurso = models.ForeignKey(
