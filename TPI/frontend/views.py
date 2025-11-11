@@ -8,6 +8,7 @@ from apps.incidentes.forms import ReporteIncidenteForm
 from django.contrib import messages
 from apps.incidentes.models import Incidente
 from apps.recursos.models import Recurso
+from apps.incidentes.services import asignar_incidentes_pendientes
 
 
 
@@ -123,6 +124,8 @@ def incidentes_asignados(request):
         ok, msg = finalizar_asignacion(incidente_id)
         if ok:
             messages.success(request, f"✅ {msg}")
+            asignar_incidentes_pendientes()  # Reasignar incidentes pendientes
+
         else:
             messages.error(request, f"❌ {msg}")
         return redirect('incidentes_asignados')

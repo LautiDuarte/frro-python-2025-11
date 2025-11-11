@@ -1,40 +1,123 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-R-8">
-    <title>Login - Sistema de Incidentes</title>
-    <style>
-        body { font-family: sans-serif; display: grid; place-items: center; min-height: 90vh; background-color: #f4f4f4; }
-        form { background: #fff; border: 1px solid #ccc; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        form p { margin: 10px 0; }
-        form input { width: 300px; padding: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .error { color: red; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Sistema de Incidentes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Mismas fuentes que tu home.html -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style type="text/tailwindcss">
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .cursive-font {
+            font-family: 'Dancing Script', cursive;
+        }
+        .btn {
+        @apply w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition-colors duration-200;
+        }
+        .btn-primary {
+        @apply bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-base font-semibold;
+        }
+        /* Estilos para los campos del formulario */
+        .form-input {
+            @apply w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+        }
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+        .btn {
+            @apply w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition-colors duration-200;
+        }
+        .btn-primary {
+            @apply bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
+        }
+        .errorlist {
+            @apply list-none p-3 bg-red-50 border border-red-300 text-red-700 rounded-md;
+        }
     </style>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen flex flex-col">
 
-    <form method="post">
-        <h2>Iniciar Sesión</h2>
+    <!-- BARRA DE NAVEGACIÓN (Consistente con home.html) -->
+    <nav class="sticky top-0 z-50 w-full py-4 px-6 md:px-12 flex justify-between items-center bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
+        <!-- Logo a la izquierda (enlazado a la home) -->
+        <a href="{% url 'index' %}" class="flex-shrink-0 flex items-center space-x-2">
+            <img class="h-12 w-auto" src="https://placehold.co/48x48/2563eb/ffffff?text=SI" alt="Logo">
+        </a>
 
-        {% csrf_token %} {% if form.errors %}
-            <p class="error">Tu usuario o contraseña no son correctos. Intenta de nuevo.</p>
-        {% endif %}
+        <!-- Botón de Registrarse a la derecha -->
+        <div>
+            <a href="{% url 'register' %}" class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-blue-600 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                Registrarse
+            </a>
+        </div>
+    </nav>
 
-        {{ form.as_p }}
+    <!-- CONTENIDO PRINCIPAL (Formulario de Login) -->
+    <main class="flex-grow flex flex-col items-center justify-center px-6 text-center">
+        <div class="w-full max-w-sm space-y-8">
+            
+            <!-- Título Cursivo -->
+            <h1 class="cursive-font text-6xl md:text-7xl text-blue-900 leading-tight drop-shadow-sm">
+                Iniciar Sesión
+            </h1>
 
-        <button type="submit">Entrar</button>
-    </form>
-</form>
+            <!-- Formulario de Login -->
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
 
-<p style="margin-top: 15px;">
-    ¿No tenés cuenta? 
-    <a href="{% url 'register' %}">Registrate acá</a>
-</p>
+                <!-- Mensaje de Error (si existe) -->
+                {% if form.errors %}
+                    <div class="errorlist">
+                        <li>Por favor, corrige los errores de abajo.</li>
+                        <!-- Opcional: mostrar errores específicos si prefieres
+                        {{ form.non_field_errors }} 
+                        -->
+                    </div>
+                {% endif %}
 
-</body>
-</html>
+                <!-- Campo de Usuario (Email) -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="form-label text-left mb-6">Email</label>
+                    <input type="email" name="username" id="{{ form.username.id_for_label }}" 
+                           class="form-input" 
+                           placeholder="tu@email.com" required>
+                    {% if form.username.errors %}<div class="errorlist mt-1">{{ form.username.errors }}</div>{% endif %}
+                </div>
 
+                <!-- Campo de Contraseña -->
+                <div>
+                    <label for="{{ form.password.id_for_label }}" class="form-label text-left mb-6">Contraseña</label>
+                    <input type="password" name="password" id="{{ form.password.id_for_label }}" 
+                           class="form-input" 
+                           placeholder="••••••••" required>
+                    {% if form.password.errors %}<div class="errorlist mt-1">{{ form.password.errors }}</div>{% endif %}
+                </div>
+
+                <!-- Botón de Envío -->
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        Entrar al Sistema
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Enlace para volver -->
+            <div class="text-sm text-gray-500">
+                <a href="{% url 'index' %}" class="font-medium text-gray-600 hover:text-blue-500">
+                    &larr; Volver a la página de inicio
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pie de página minimalista -->
+    <footer class="py-4 text-center text-gray-400 text-sm">
+        © {% now "Y" %}
+    </footer>
 
 </body>
 </html>

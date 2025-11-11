@@ -13,16 +13,17 @@ class CustomUserCreationForm(UserCreationForm):
     )
     
     # Definimos el campo de rol aquí
-    rol = forms.ChoiceField(
-        choices=Usuario.rol.field.choices,
-        label='Rol de Usuario',
-        required=True
+
+    institucion_asignada = forms.ModelChoiceField(
+        queryset=Institucion.objects.all(),
+        required=True, # Es requerido porque todos son 'usuario'
+        label="Institución de Afiliación",
     )
 
     class Meta:
         model = Usuario
         # El formulario manejará estos campos del modelo
-        fields = ('email', 'nombre', 'apellido', 'rol', 'institucion_asignada')
+        fields = ('email', 'nombre', 'apellido', 'institucion_asignada')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -44,7 +45,7 @@ class CustomUserCreationForm(UserCreationForm):
         user = super().save(commit=False)
         
         # Asignamos los campos personalizados
-        user.rol = self.cleaned_data.get('rol')
+        user.rol = 'usuario'
         institucion = self.cleaned_data.get('institucion_asignada')
         
         if user.rol == 'usuario' and institucion:
