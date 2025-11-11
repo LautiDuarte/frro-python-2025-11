@@ -88,22 +88,19 @@
             <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">
                     <i class="fas fa-ambulance text-blue-500"></i>
-                    Nuestra Flota (Recursos)
+                    Nuestra Flota (Ambulancias)
                 </h2>
                 <form method="POST" class="bg-gray-50 p-4 rounded mb-4">
                     {% csrf_token %}
-                    <div class="space-y-2">
-                        {{ form_recurso.tipo_recurso }}
-                    </div>
                     <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded w-full mt-3">
-                        + Agregar Recurso
+                        + Agregar ambulancia
                     </button>
                 </form>
                 {% if recursos_asignados %}
                     <div class="space-y-4">
                         {% for recurso in recursos_asignados %}
                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
-                                <span class="font-medium text-gray-700">#{{ recurso.id }} - {{ recurso.tipo_recurso.nombre }}</span>
+                                <span class="font-medium text-gray-700">Unidad #{{ recurso.id }}</span>
                                 
                                 {% if recurso.estado|lower == 'disponible' %}
                                     <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
@@ -114,7 +111,7 @@
                                         <i class="fas fa-exclamation-triangle"></i> {{ recurso.estado }}
                                     </span>
                                 {% endif %}
-                                
+
                                 <a href="?eliminar_recurso={{ recurso.id }}" class="text-red-600 hover:text-red-800 font-bold text-lg"
                                     onclick="return confirm('¿Seguro que querés eliminar este recurso?');">🗑️</a>
                             </div>
@@ -141,6 +138,7 @@
                                     <th>Gravedad</th>
                                     <th>Estado</th>
                                     <th>Fecha/Hora</th>
+                                    <th class="text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -154,12 +152,24 @@
                                         {% if incidente.estado == 'PENDIENTE' %} bg-yellow-100 text-yellow-800
                                         {% elif incidente.estado == 'ASIGNADO' %} bg-blue-100 text-blue-800
                                         {% elif incidente.estado == 'ACTIVO' %} bg-green-100 text-green-800
+                                        {% elif incidente.estado == 'FINALIZADO' %} bg-gray-300 text-gray-600
                                         {% else %} bg-gray-100 text-gray-800
                                         {% endif %}">
                                             {{ incidente.estado }}
                                         </span>
                                     </td>
                                     <td>{{ incidente.fecha_hora | date:"d/m/Y H:i" }}</td>
+                                    <td class="text-center">
+                                        {% if incidente.estado == 'ASIGNADO' %}
+                                        <a href="?finalizar_incidente={{ incidente.id }}"
+                                            onclick="return confirm('¿Seguro que querés finalizar este incidente? Esto liberará la ambulancia.');"
+                                            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+                                            Finalizar
+                                        </a>
+                                        {% else %}
+                                        <span class="text-gray-400 italic">—</span>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

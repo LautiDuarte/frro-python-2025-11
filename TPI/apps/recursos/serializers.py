@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Recurso, Institucion, TipoRecurso
+from .models import Recurso, Institucion
 
 class InstitucionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,7 +11,3 @@ class RecursoSerializer(serializers.ModelSerializer):
         model = Recurso
         fields = "__all__"
 
-class TipoRecursoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TipoRecurso
-        fields = "__all__"

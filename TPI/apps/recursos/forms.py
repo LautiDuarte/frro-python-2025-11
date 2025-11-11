@@ -4,7 +4,9 @@ from .models import Recurso
 class RecursoForm(forms.ModelForm):
     class Meta:
         model = Recurso
-        fields = ['tipo_recurso']
+        fields = ['institucion_base', 'latitud', 'longitud']
         widgets = {
-            'tipo_recurso': forms.Select(attrs={'class': 'border p-2 rounded w-full'}),
+            'institucion_base': forms.Select(attrs={'class': 'form-control'}),
+            'latitud': forms.NumberInput(attrs={'class': 'form-control'}),
+            'longitud': forms.NumberInput(attrs={'class': 'form-control'}),
         }
