@@ -9,4 +9,3 @@ class InstitucionViewSet(viewsets.ModelViewSet):
 class RecursoViewSet(viewsets.ModelViewSet):
     queryset = Recurso.objects.all()
     serializer_class = RecursoSerializer
-

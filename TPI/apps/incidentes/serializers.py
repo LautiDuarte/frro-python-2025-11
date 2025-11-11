@@ -1,10 +1,5 @@
 from rest_framework import serializers
-from .models import Incidente, TipoIncidente, Asignacion
-
-class TipoIncidenteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TipoIncidente
-        fields = "__all__"
+from .models import Incidente, Asignacion
 
 class IncidenteSerializer(serializers.ModelSerializer):
     class Meta:

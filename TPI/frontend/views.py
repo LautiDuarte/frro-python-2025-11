@@ -1,26 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
+from apps.incidentes.services import finalizar_asignacion
 from apps.usuarios.forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
 from apps.incidentes.forms import ReporteIncidenteForm
 from django.contrib import messages
 from apps.incidentes.models import Incidente
 from apps.recursos.models import Recurso
-import json
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
-from apps.recursos.models import Institucion
-from apps.recursos.serializers import InstitucionSerializer, RecursoSerializer
-from rest_framework import viewsets 
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from django.views import generic
-from apps.usuarios.forms import CustomUserCreationForm
-from django.contrib.auth.decorators import login_required
-from apps.incidentes.forms import ReporteIncidenteForm
-from django.contrib import messages
 
 
 
@@ -113,7 +100,34 @@ def incidentes_asignados(request):
         
     # 1. Obtener la institución del usuario (Hospital)
     institucion_del_usuario = getattr(request.user, 'institucion_asignada', None)
+    if not institucion_del_usuario:
+        messages.error(request, "Tu usuario no tiene una institución asignada.")
+        return redirect('logout')
     
+    if request.method == 'POST':
+        nuevo_recurso = Recurso(
+            institucion_base=institucion_del_usuario,
+            estado='DISPONIBLE'
+        )
+        nuevo_recurso.save()
+        messages.success(request, f"🚑 Recurso #{nuevo_recurso.id} creado con éxito.")
+        return redirect('incidentes_asignados')
+    elif 'eliminar_recurso' in request.GET:
+        recurso_id = request.GET.get('eliminar_recurso')
+        recurso = get_object_or_404(Recurso, id=recurso_id, institucion_base=institucion_del_usuario)
+        recurso.delete()
+        messages.success(request, "🗑️ Recurso eliminado correctamente.")
+        return redirect('incidentes_asignados')
+    elif 'finalizar_incidente' in request.GET:
+        incidente_id = request.GET.get('finalizar_incidente')
+        ok, msg = finalizar_asignacion(incidente_id)
+        if ok:
+            messages.success(request, f"✅ {msg}")
+        else:
+            messages.error(request, f"❌ {msg}")
+        return redirect('incidentes_asignados')
+
+
     # Inicializar QuerySets vacíos
     recursos_de_la_institucion = Recurso.objects.none()
     incidentes_asignados = Incidente.objects.none()

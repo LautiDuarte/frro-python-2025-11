@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Incidente, Asignacion, TipoIncidente
+from .models import Incidente, Asignacion
 
 class AsignacionInline(admin.TabularInline):
     """
@@ -15,9 +15,9 @@ class IncidenteAdmin(admin.ModelAdmin):
     """
     Configuración para Incidentes.
     """
-    list_display = ('id', 'titulo', 'estado', 'gravedad', 'tipo', 'usuario', 'fecha_hora')
+    list_display = ('id', 'titulo', 'estado', 'gravedad', 'usuario', 'fecha_hora')
     search_fields = ('titulo', 'detalle')
-    list_filter = ('estado', 'gravedad', 'tipo')
+    list_filter = ('estado', 'gravedad')
     
     # Añade el inline de Asignacion
     inlines = [AsignacionInline]
@@ -32,4 +32,3 @@ class AsignacionAdmin(admin.ModelAdmin):
     autocomplete_fields = ['incidente', 'recurso']
 
 # Registra el modelo simple
-admin.site.register(TipoIncidente)
