@@ -8,6 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
@@ -72,6 +75,23 @@
             background-color: #e9ecef;
             color: #333;
         }
+        /* Asegura que el control de geocoder quede por encima del mapa y sidebar */
+        .leaflet-control-geocoder {
+        z-index: 3000;
+        }
+        /* Un poco de separación arriba/izquierda del control */
+        .leaflet-top .leaflet-control {
+        margin-top: 12px;
+        margin-left: 12px;
+        }
+        
+        /* Asegura superposición correcta */
+        #searchBar { pointer-events: auto; }
+        .leaflet-control-container { z-index: 1000; } /* por si en el futuro agregás más controles */
+
+        #searchResults .item { cursor: pointer; }
+        #searchResults .item:hover { background: #f3f4f6; } /* tailwind equivalent */
+
     </style>
 </head>
 
@@ -99,13 +119,35 @@
             </header>
 
         <div id="map"></div>
+        <!-- Barra de búsqueda centrada -->
+        <div id="searchBar" class="fixed top-6 left-1/2 -translate-x-1/2 z-[4000] w-[90%] max-w-xl">
+            <form id="searchForm" class="flex items-stretch gap-2">
+                <input id="searchInput" type="text" placeholder='Ej: "Montevideo e Italia, Rosario"'
+                    class="flex-1 px-4 py-3 rounded-full border border-gray-300 shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    autocomplete="off" />
+                <button type="submit"
+                    class="px-5 py-3 rounded-full bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition">
+                    Buscar
+                </button>
+            </form>
+            <div id="searchHint" class="mt-2 text-sm text-gray-600">
+                Tip: podés escribir <b>“Montevideo & España, Rosario”</b> o <b>“Montevideo e Italia”</b>
+            </div>
+            <div id="searchResults" class="mt-2 bg-white rounded-xl shadow-xl border border-gray-200 max-h-72 overflow-auto hidden">
+                <!-- acá van las sugerencias -->
+            </div>
 
-        <div style="position: fixed; top: 100px; right: 20px; z-index: 3000;">
+        </div>
+
+
+
+        <div style="position: fixed; bottom: 24px; right: 24px; z-index: 3000;">
             <button id="btnNuevoIncidente" disabled
-                style="padding: 10px 20px; background-color: gray; color: white; border: none; border-radius: 5px; cursor: not-allowed;">
+                class="px-5 py-3 rounded-full bg-gray-400 text-white font-semibold shadow cursor-not-allowed">
                 Reportar Incidente 🚨
             </button>
         </div>
+
 
         <div id="modalIncidente"
             class="fixed hidden inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[5000]">
@@ -145,6 +187,147 @@
             }).addTo(map);
 
             const btnNuevoIncidente = document.getElementById('btnNuevoIncidente');
+
+            // Helpers del botón (ya los tenés definidos)
+                function enableReportButton() {
+                    btnNuevoIncidente.disabled = false;
+                    btnNuevoIncidente.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                    btnNuevoIncidente.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                }
+                function disableReportButton() {
+                    btnNuevoIncidente.disabled = true;
+                    btnNuevoIncidente.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    btnNuevoIncidente.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                }
+
+                // Elementos del buscador
+                const searchForm = document.getElementById('searchForm');
+                const searchInput = document.getElementById('searchInput');
+                const resultsBox = document.getElementById('searchResults');
+
+                let debounceTimer = null;
+                let lastResults = [];
+
+                // Normaliza intersecciones y asegura Rosario
+                function normalizeQuery(q) {
+                    q = (q || '').trim();
+                    if (!q) return '';
+                    // " y " / " e " -> " & "
+                    q = q.replace(/\s+[ye]\s+/gi, ' & ');
+                    // Forzar ciudad si no está
+                    if (!/rosario/i.test(q)) {
+                        q = `${q}, Rosario, Santa Fe, Argentina`;
+                    }
+                    return q;
+                }
+
+                // Llama a Nominatim
+                async function nominatimSearch(q) {
+                    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&accept-language=es&q=${encodeURIComponent(q)}`;
+                    const r = await fetch(url, {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (!r.ok) throw new Error('Error consultando Nominatim');
+                    return r.json();
+                }
+
+                // Renderiza el dropdown
+                function renderResults(items) {
+                    lastResults = items;
+                    if (!items || !items.length) {
+                        resultsBox.classList.add('hidden');
+                        resultsBox.innerHTML = '';
+                        return;
+                    }
+                    resultsBox.innerHTML = items.map((it, idx) => `
+    <div class="item px-4 py-3 border-b last:border-0" data-idx="${idx}">
+      <div class="text-sm font-medium text-gray-800">${it.display_name}</div>
+      <div class="text-xs text-gray-500">${Number(it.lat).toFixed(5)}, ${Number(it.lon).toFixed(5)}</div>
+    </div>
+  `).join('');
+                    resultsBox.classList.remove('hidden');
+
+                    // Click en un resultado
+                    Array.from(resultsBox.querySelectorAll('.item')).forEach(el => {
+                        el.addEventListener('click', () => {
+                            const it = lastResults[parseInt(el.dataset.idx, 10)];
+                            selectResult(it);
+                        });
+                    });
+                }
+
+                // Aplica la selección: marca en el mapa y setea coords
+                function selectResult(it) {
+                    const lat = parseFloat(it.lat);
+                    const lon = parseFloat(it.lon);
+                    const name = it.display_name;
+
+                    if (window.tempMarker) map.removeLayer(window.tempMarker);
+                    const center = L.latLng(lat, lon);
+                    window.tempMarker = L.marker(center).addTo(map).bindPopup(name).openPopup();
+                    map.setView(center, 16);
+
+                    window.latitudSeleccionada = lat;
+                    window.longitudSeleccionada = lon;
+                    enableReportButton();
+
+                    // cerrar dropdown
+                    resultsBox.classList.add('hidden');
+                    resultsBox.innerHTML = '';
+                }
+
+                // Autocomplete (cada vez que escribe)
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    const raw = searchInput.value.trim();
+                    if (raw.length < 3) {
+                        resultsBox.classList.add('hidden');
+                        resultsBox.innerHTML = '';
+                        return;
+                    }
+                    debounceTimer = setTimeout(async () => {
+                        try {
+                            const q = normalizeQuery(raw);
+                            const data = await nominatimSearch(q);
+                            renderResults(data);
+                        } catch (e) {
+                            resultsBox.classList.add('hidden');
+                            resultsBox.innerHTML = '';
+                        }
+                    }, 300);
+                });
+
+                // Enter en el form: toma el primer resultado, o busca y usa el primero
+                searchForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const raw = searchInput.value.trim();
+                    if (!raw) return;
+
+                    // Si ya hay resultados visibles, usar el primero
+                    if (lastResults && lastResults.length) {
+                        selectResult(lastResults[0]);
+                        return;
+                    }
+
+                    // Si no, buscar ahora y usar el primero si existe
+                    try {
+                        const q = normalizeQuery(raw);
+                        const data = await nominatimSearch(q);
+                        if (data && data.length) {
+                            selectResult(data[0]);
+                        } else {
+                            alert('No se encontró esa dirección/intersección. Probá con "Calle1 & Calle2, Rosario".');
+                        }
+                    } catch (e2) {
+                        alert('No se pudo completar la búsqueda. Intentá de nuevo.');
+                    }
+                });
+
+
+
+
+
+
 
             // -----------------------
             // Mostrar incidentes existentes (Fetch a la API)
@@ -202,11 +385,8 @@
                 window.tempMarker = L.marker(e.latlng).addTo(map);
                 window.latitudSeleccionada = e.latlng.lat;
                 window.longitudSeleccionada = e.latlng.lng;
-
-                // Habilitar botón al seleccionar ubicación
-                btnNuevoIncidente.disabled = false;
-                btnNuevoIncidente.style.backgroundColor = '#007bff';
-                btnNuevoIncidente.style.cursor = 'pointer';
+            
+                enableReportButton();
             });
 
             // Lógica del Modal (abrir/cerrar/limpiar)
@@ -217,7 +397,6 @@
             btnNuevoIncidente.addEventListener('click', () => {
                 limpiarFormulario();
                 modal.classList.remove('hidden');
-                cargarTiposRecursos();
             });
 
             cancelarBtn.addEventListener('click', () => {
@@ -263,10 +442,9 @@
                             if (layer instanceof L.Marker) map.removeLayer(layer);
                         });
                         cargarIncidentes();
+                        cargarInstituciones(); 
 
-                        btnNuevoIncidente.disabled = true;
-                        btnNuevoIncidente.style.backgroundColor = 'gray';
-                        btnNuevoIncidente.style.cursor = 'not-allowed';
+                        disableReportButton();
                         window.latitudSeleccionada = null;
                         window.longitudSeleccionada = null;
                         if (window.tempMarker) {
@@ -274,6 +452,7 @@
                             window.tempMarker = null;
                         }
                     })
+                    
                     .catch(err => alert(err));
             });
 
