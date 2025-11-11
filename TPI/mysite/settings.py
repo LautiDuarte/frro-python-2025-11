@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +45,8 @@ INSTALLED_APPS = [
     'apps.rutas',
     'rest_framework',
 ]
+
+
 
 # Archivos estáticos (CSS, JS, imágenes)
 STATIC_URL = "/static/"
@@ -161,3 +164,49 @@ LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
 
 LOGIN_URL = 'login'
+
+JAZZMIN_SETTINGS = {
+    # Título de la ventana (Browser tab)
+    "site_title": "Admin SGI",
+
+    # Título en la barra de login/navbar (puede ser HTML)
+    "site_header": "Sistema de Incidentes",
+
+    # Título en el logo (versión corta)
+    "site_brand": "SGI Admin",
+
+    # Logo para la página de login (opcional)
+    # Reemplaza esto con la ruta estática a tu logo
+    "login_logo": "https" + "://placehold.co/100x100/2563eb/ffffff?text=SGI",
+
+    # Logo en la barra superior (navbar)
+    "topmenu_links": [
+        {"name": "Home", "url": "index", "permissions": ["auth.view_user"]},
+    ],
+
+    # --- UI CUSTOMIZATION ---
+    # Para que se vea más moderno
+    "ui_tweaks": {
+        "navbar_small_text": False,
+        "footer_small_text": False,
+        "body_small_text": False,
+        "brand_small_text": False,
+        "brand_colour": "navbar-dark",
+        "accent": "accent-primary",
+        "navbar": "navbar-dark",
+        "no_navbar_border": False,
+        "sidebar": "sidebar-dark-primary",
+        "sidebar_nav_small_text": False,
+        "sidebar_disable_expand": False,
+        "sidebar_nav_child_indent": False,
+        "sidebar_nav_compact_style": False,
+        "sidebar_nav_legacy_style": False,
+        "sidebar_nav_flat_style": True, # ¡Este se ve muy bien!
+    },
+    
+    # Mensaje de bienvenida en la página de inicio
+    "welcome_sign": "Bienvenido al Panel de Administración del Sistema de Incidentes",
+
+    # Copyright en el footer
+    "copyright": "Sistema de Incidentes v1.0",
+}
