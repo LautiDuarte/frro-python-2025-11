@@ -153,8 +153,16 @@
                     .then(res => res.json())
                     .then(data => {
                         data.forEach(i => {
-                            if (i.latitud && i.longitud) {
-                                const marker = L.marker([i.latitud, i.longitud]).addTo(map);
+                            if (i.latitud && i.longitud && i.estado !== 'FINALIZADO') {
+
+                                const iconoIncidente = L.icon({
+                                    iconUrl: "{% static 'icons/incidente.png' %}",
+                                    iconSize: [32, 32],
+                                    iconAnchor: [16, 32],
+                                    popupAnchor: [0, -28]
+                                });
+
+                                const marker = L.marker([i.latitud, i.longitud], { icon: iconoIncidente }).addTo(map);
                                 marker.bindPopup(`
                                     <strong>${i.titulo}</strong><br>
                                     ${i.detalle}<br>
@@ -167,34 +175,34 @@
             }
             cargarIncidentes();
 
-        function cargarInstituciones() {
-            fetch('/api/recursos/instituciones/')
-                .then(res => res.json())
-                .then(data => {
-                    data.forEach(inst => {
-                        if (inst.latitud && inst.longitud) {
+            function cargarInstituciones() {
+                fetch('/api/recursos/instituciones/')
+                    .then(res => res.json())
+                    .then(data => {
+                        data.forEach(inst => {
+                            if (inst.latitud && inst.longitud) {
 
-                            const iconoInstitucion = L.icon({
-                                iconUrl: "{% static 'icons/hospital.svg' %}",
-                                iconSize: [32, 32],
-                                iconAnchor: [16, 32],
-                                popupAnchor: [0, -28]
-                            });
+                                const iconoInstitucion = L.icon({
+                                    iconUrl: "{% static 'icons/hospital.png' %}",
+                                    iconSize: [32, 32],
+                                    iconAnchor: [16, 32],
+                                    popupAnchor: [0, -28]
+                                });
 
-                            const marker = L.marker([inst.latitud, inst.longitud], { icon: iconoInstitucion }).addTo(map);
-                            marker.bindPopup(`
-                        <strong>${inst.nombre}</strong><br>
-                        <em>Centro de atención de emergencias</em>
-                    `);
-                        }
+                                const marker = L.marker([inst.latitud, inst.longitud], { icon: iconoInstitucion }).addTo(map);
+                                marker.bindPopup(`
+                                    <strong>${inst.nombre}</strong><br>
+                                    <em>Centro de atención de emergencias</em>
+                                `);
+                            }
+                        });
                     });
-                });
-        }
+            }
 
-        cargarInstituciones();
-        // -----------------------
-        // Control de selección de ubicación
-        // -----------------------
+            cargarInstituciones();
+            // -----------------------
+            // Control de selección de ubicación
+            // -----------------------
 
             map.on('click', e => {
                 if (window.tempMarker) map.removeLayer(window.tempMarker);
