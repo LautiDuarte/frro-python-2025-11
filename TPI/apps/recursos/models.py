@@ -3,7 +3,6 @@ from django.conf import settings # Usar settings.AUTH_USER_MODEL es la mejor pr√
 
 class Institucion(models.Model):
     nombre = models.CharField(max_length=100)
-    tipo = models.CharField(max_length=50, default=None) 
     latitud = models.FloatField(default=None, null=True, blank=True)
     longitud = models.FloatField(default=None, null=True, blank=True)
 

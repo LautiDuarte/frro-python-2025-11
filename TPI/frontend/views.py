@@ -40,7 +40,8 @@ def index(request):
     
     rol_usuario = request.user.rol.lower()
 
-
+    if rol_usuario == 'admin':
+      return redirect('/admin/')
     # Si es USUARIO (Hospital), lo enviamos a la vista que solo muestra la tabla.
     if rol_usuario == 'usuario':
         return redirect('incidentes_asignados') 
