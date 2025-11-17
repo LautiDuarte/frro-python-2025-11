@@ -2,12 +2,11 @@
 
 ## Descripción del proyecto
 
-El proyecto consiste en el desarrollo de un simulador de emergencias urbanas con logística de respuesta automática, orientado a representar de forma realista y visual cómo distintas unidades de emergencia (como bomberos, ambulancias o cuadrillas eléctricas) actúan ante situaciones críticas en una ciudad. La aplicación ofrece a los usuarios la posibilidad de registrar incidentes, como incendios, accidentes de tránsito o cortes de luz, y tiene como objetivo gestionar y asignar los recursos disponibles de forma óptima, teniendo en cuenta la gravedad de cada evento, su localización y las condiciones del tráfico urbano simulado.
+El proyecto consiste en el desarrollo de un simulador de emergencias urbanas con logística de respuesta automática, orientado a representar de forma realista y visual cómo distintas unidades de emergencia (ambulancias) actúan ante situaciones críticas en una ciudad. La aplicación ofrece a los usuarios la posibilidad de registrar incidentes, y tiene como objetivo gestionar y asignar los recursos disponibles de forma óptima, teniendo en cuenta la gravedad de cada evento y su localización.
 
 ## Diagrama Entidad - Relación
 
-<img width="886" height="750" alt="image" src="https://github.com/user-attachments/assets/e6d2c6e6-c5e6-4046-b065-b28cf2ab6fd0" />
-
+<img width="874" height="769" alt="image" src="https://github.com/user-attachments/assets/33abceec-ede1-4c2a-b760-6478ccccbee1" />
 
 ## Bosquejo de Arquitectura
 
@@ -18,9 +17,8 @@ Descripción general de la interacción:
 
 1. El usuario accede al mapa desde el navegador.
 2. El frontend envía peticiones HTTP al backend (/api/...) para registrar usuarios, iniciar sesión y reportar incidentes.
-3. El backend Django valida la autenticación JWT y procesa la lógica de negocio.
+3. El backend Django procesa la lógica de negocio.
 4. Los datos se almacenan y consultan en una base de datos relacional (MySQL).
-5. Los tokens JWT permiten sesiones seguras y separación entre usuarios autenticados y no autenticados.
 
 <img width="1024" height="1536" alt="Diagrama de arquitectura de incidentes" src="https://github.com/user-attachments/assets/e2e3dff5-7aea-4557-a603-97896ded5ce2" />
 
@@ -32,13 +30,13 @@ Definir los requerimientos del sistema.
 
 - R01. El sistema debe permitir registrar nuevos usuarios proporcionando nombre, apellido, email, contraseña y rol.
 - R02. El sistema debe permitir iniciar sesión con email y contraseña.
-- R03. El sistema debe permitir cerrar sesión y eliminar el token de autenticación.
+- R03. El sistema debe permitir cerrar sesión y eliminar el sessionid.
 - R04. El sistema debe diferenciar los roles de usuario (Administrador, Operador, Usuario).
-- R05. El sistema debe autenticar mediante tokens JWT a los usuarios que acceden a funciones protegidas.
+- R05. El sistema debe autenticar mediante sessionid a los usuarios que acceden a funciones protegidas.
 - R06. El sistema debe mostrar en un mapa todos los incidentes registrados con su título, descripción y ubicación.
-- R07. El sistema debe permitir que los usuarios autenticados reporten un nuevo incidente haciendo clic en el mapa.
+- R07. El sistema debe permitir que los operadores autenticados reporten un nuevo incidente haciendo clic en el mapa.
 - R08. El sistema debe permitir visualizar todos los incidentes en el mapa mediante marcadores.
-- R09. El sistema debe validar que solo los usuarios autenticados puedan crear incidentes.
+- R09. El sistema debe validar que solo los operadores autenticados puedan crear incidentes.
 - R10. El sistema debe registrar la fecha y ubicación del incidente al momento de su creación.
 - R11. El sistema debe permitir a los administradores consultar todos los incidentes registrados.
 
@@ -67,11 +65,11 @@ Listado y descripción breve de los requerimientos no funcionales. Utilizar las 
 
 - El sistema debe diseñarse con la arquitectura en 3 capas. Presentación (frontend), Negocio (Django + lógica de negocio), Datos (ORM y DB).
 - El sistema debe utilizar control de versiones mediante GIT (GitHub).
-- Se utiliza Python 3.12 y Django REST Framework, con código modular por dominio (usuarios, incidentes, recursos, rutas, etc).
+- Se utiliza Python 3.12, con código modular por dominio (usuarios, incidentes, recursos, rutas, etc).
 
 ### Reliability
 
-- El sistema debe mantener la sesión activa mientras el token JWT sea válido.
+- El sistema debe mantener la sesión activa mientras el sessionid sea válido.
 - Si el token expira, el usuario debe volver a autenticarse.
 
 ### Scalability
@@ -113,8 +111,6 @@ Motivo: permite manejo sencillo de modelos, migraciones automáticas y consultas
 ### Capa de Negocio
 
 Framework: Django REST Framework.
-
-Autenticación: rest_framework_simplejwt para gestión de tokens JWT.
 
 Motivo: separación clara entre endpoints, control de permisos y serialización de datos.
 
