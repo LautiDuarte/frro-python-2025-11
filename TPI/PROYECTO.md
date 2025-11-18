@@ -6,8 +6,7 @@ El proyecto consiste en el desarrollo de un simulador de emergencias urbanas con
 
 ## Diagrama Entidad - Relación
 
-<img width="757" height="706" alt="image" src="https://github.com/user-attachments/assets/b838cf63-2ba3-4e85-8054-8c4fadca5965" />
-
+<img width="720" height="677" alt="image" src="https://github.com/user-attachments/assets/2eeb1dfb-f23a-4475-b345-c1ace9c49d5d" />
 
 ## Bosquejo de Arquitectura
 
