@@ -194,147 +194,144 @@
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
+            window.routeLayers = [];
+
             const btnNuevoIncidente = document.getElementById('btnNuevoIncidente');
 
             // Helpers del botón (ya los tenés definidos)
-                function enableReportButton() {
-                    btnNuevoIncidente.disabled = false;
-                    btnNuevoIncidente.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                    btnNuevoIncidente.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            function enableReportButton() {
+                btnNuevoIncidente.disabled = false;
+                btnNuevoIncidente.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                btnNuevoIncidente.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }
+            function disableReportButton() {
+                btnNuevoIncidente.disabled = true;
+                btnNuevoIncidente.classList.add('bg-gray-400', 'cursor-not-allowed');
+                btnNuevoIncidente.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            }
+
+            // Elementos del buscador
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
+            const resultsBox = document.getElementById('searchResults');
+
+            let debounceTimer = null;
+            let lastResults = [];
+
+            // Normaliza intersecciones y asegura Rosario
+            function normalizeQuery(q) {
+                q = (q || '').trim();
+                if (!q) return '';
+                // " y " / " e " -> " & "
+                q = q.replace(/\s+[ye]\s+/gi, ' & ');
+                // Forzar ciudad si no está
+                if (!/rosario/i.test(q)) {
+                    q = `${q}, Rosario, Santa Fe, Argentina`;
                 }
-                function disableReportButton() {
-                    btnNuevoIncidente.disabled = true;
-                    btnNuevoIncidente.classList.add('bg-gray-400', 'cursor-not-allowed');
-                    btnNuevoIncidente.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                }
+                return q;
+            }
 
-                // Elementos del buscador
-                const searchForm = document.getElementById('searchForm');
-                const searchInput = document.getElementById('searchInput');
-                const resultsBox = document.getElementById('searchResults');
+            // Llama a Nominatim
+            async function nominatimSearch(q) {
+                const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&accept-language=es&q=${encodeURIComponent(q)}`;
+                const r = await fetch(url, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!r.ok) throw new Error('Error consultando Nominatim');
+                return r.json();
+            }
 
-                let debounceTimer = null;
-                let lastResults = [];
-
-                // Normaliza intersecciones y asegura Rosario
-                function normalizeQuery(q) {
-                    q = (q || '').trim();
-                    if (!q) return '';
-                    // " y " / " e " -> " & "
-                    q = q.replace(/\s+[ye]\s+/gi, ' & ');
-                    // Forzar ciudad si no está
-                    if (!/rosario/i.test(q)) {
-                        q = `${q}, Rosario, Santa Fe, Argentina`;
-                    }
-                    return q;
-                }
-
-                // Llama a Nominatim
-                async function nominatimSearch(q) {
-                    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&accept-language=es&q=${encodeURIComponent(q)}`;
-                    const r = await fetch(url, {
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    if (!r.ok) throw new Error('Error consultando Nominatim');
-                    return r.json();
-                }
-
-                // Renderiza el dropdown
-                function renderResults(items) {
-                    lastResults = items;
-                    if (!items || !items.length) {
-                        resultsBox.classList.add('hidden');
-                        resultsBox.innerHTML = '';
-                        return;
-                    }
-                    resultsBox.innerHTML = items.map((it, idx) => `
-    <div class="item px-4 py-3 border-b last:border-0" data-idx="${idx}">
-      <div class="text-sm font-medium text-gray-800">${it.display_name}</div>
-      <div class="text-xs text-gray-500">${Number(it.lat).toFixed(5)}, ${Number(it.lon).toFixed(5)}</div>
-    </div>
-  `).join('');
-                    resultsBox.classList.remove('hidden');
-
-                    // Click en un resultado
-                    Array.from(resultsBox.querySelectorAll('.item')).forEach(el => {
-                        el.addEventListener('click', () => {
-                            const it = lastResults[parseInt(el.dataset.idx, 10)];
-                            selectResult(it);
-                        });
-                    });
-                }
-
-                // Aplica la selección: marca en el mapa y setea coords
-                function selectResult(it) {
-                    const lat = parseFloat(it.lat);
-                    const lon = parseFloat(it.lon);
-                    const name = it.display_name;
-
-                    if (window.tempMarker) map.removeLayer(window.tempMarker);
-                    const center = L.latLng(lat, lon);
-                    window.tempMarker = L.marker(center).addTo(map).bindPopup(name).openPopup();
-                    map.setView(center, 16);
-
-                    window.latitudSeleccionada = lat;
-                    window.longitudSeleccionada = lon;
-                    enableReportButton();
-
-                    // cerrar dropdown
+            // Renderiza el dropdown
+            function renderResults(items) {
+                lastResults = items;
+                if (!items || !items.length) {
                     resultsBox.classList.add('hidden');
                     resultsBox.innerHTML = '';
+                    return;
                 }
+                resultsBox.innerHTML = items.map((it, idx) => `
+                    <div class="item px-4 py-3 border-b last:border-0" data-idx="${idx}">
+                    <div class="text-sm font-medium text-gray-800">${it.display_name}</div>
+                    <div class="text-xs text-gray-500">${Number(it.lat).toFixed(5)}, ${Number(it.lon).toFixed(5)}</div>
+                    </div>
+                `).join('');
+                resultsBox.classList.remove('hidden');
 
-                // Autocomplete (cada vez que escribe)
-                searchInput.addEventListener('input', () => {
-                    clearTimeout(debounceTimer);
-                    const raw = searchInput.value.trim();
-                    if (raw.length < 3) {
-                        resultsBox.classList.add('hidden');
-                        resultsBox.innerHTML = '';
-                        return;
-                    }
-                    debounceTimer = setTimeout(async () => {
-                        try {
-                            const q = normalizeQuery(raw);
-                            const data = await nominatimSearch(q);
-                            renderResults(data);
-                        } catch (e) {
-                            resultsBox.classList.add('hidden');
-                            resultsBox.innerHTML = '';
-                        }
-                    }, 300);
+                // Click en un resultado
+                Array.from(resultsBox.querySelectorAll('.item')).forEach(el => {
+                    el.addEventListener('click', () => {
+                        const it = lastResults[parseInt(el.dataset.idx, 10)];
+                        selectResult(it);
+                    });
                 });
+            }
 
-                // Enter en el form: toma el primer resultado, o busca y usa el primero
-                searchForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const raw = searchInput.value.trim();
-                    if (!raw) return;
+            // Aplica la selección: marca en el mapa y setea coords
+            function selectResult(it) {
+                const lat = parseFloat(it.lat);
+                const lon = parseFloat(it.lon);
+                const name = it.display_name;
 
-                    // Si ya hay resultados visibles, usar el primero
-                    if (lastResults && lastResults.length) {
-                        selectResult(lastResults[0]);
-                        return;
-                    }
+                if (window.tempMarker) map.removeLayer(window.tempMarker);
+                const center = L.latLng(lat, lon);
+                window.tempMarker = L.marker(center).addTo(map).bindPopup(name).openPopup();
+                map.setView(center, 16);
 
-                    // Si no, buscar ahora y usar el primero si existe
+                window.latitudSeleccionada = lat;
+                window.longitudSeleccionada = lon;
+                enableReportButton();
+
+                // cerrar dropdown
+                resultsBox.classList.add('hidden');
+                resultsBox.innerHTML = '';
+            }
+
+            // Autocomplete (cada vez que escribe)
+            searchInput.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                const raw = searchInput.value.trim();
+                if (raw.length < 3) {
+                    resultsBox.classList.add('hidden');
+                    resultsBox.innerHTML = '';
+                    return;
+                }
+                debounceTimer = setTimeout(async () => {
                     try {
                         const q = normalizeQuery(raw);
                         const data = await nominatimSearch(q);
-                        if (data && data.length) {
-                            selectResult(data[0]);
-                        } else {
-                            alert('No se encontró esa dirección/intersección. Probá con "Calle1 & Calle2, Rosario".');
-                        }
-                    } catch (e2) {
-                        alert('No se pudo completar la búsqueda. Intentá de nuevo.');
+                        renderResults(data);
+                    } catch (e) {
+                        resultsBox.classList.add('hidden');
+                        resultsBox.innerHTML = '';
                     }
-                });
+                }, 300);
+            });
 
+            // Enter en el form: toma el primer resultado, o busca y usa el primero
+            searchForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const raw = searchInput.value.trim();
+                if (!raw) return;
 
+                // Si ya hay resultados visibles, usar el primero
+                if (lastResults && lastResults.length) {
+                    selectResult(lastResults[0]);
+                    return;
+                }
 
-
-
+                // Si no, buscar ahora y usar el primero si existe
+                try {
+                    const q = normalizeQuery(raw);
+                    const data = await nominatimSearch(q);
+                    if (data && data.length) {
+                        selectResult(data[0]);
+                    } else {
+                        alert('No se encontró esa dirección/intersección. Probá con "Calle1 & Calle2, Rosario".');
+                    }
+                } catch (e2) {
+                    alert('No se pudo completar la búsqueda. Intentá de nuevo.');
+                }
+            });
 
 
             // -----------------------
@@ -392,6 +389,84 @@
             }
 
             cargarInstituciones();
+
+            function clearRoutes() {
+                if (window.routeLayers && window.routeLayers.length) {
+                    window.routeLayers.forEach(l => {
+                        try { map.removeLayer(l); } catch (e) { }
+                    });
+                }
+                window.routeLayers = [];
+            }
+
+            async function dibujarRuta(institucion, incidente) {
+                if (!institucion || !incidente) return;
+
+                const from_lat = institucion.latitud;
+                const from_lon = institucion.longitud;
+                const to_lat = incidente.latitud;
+                const to_lon = incidente.longitud;
+
+                try {
+                    const q = `/api/rutas/route/?from_lat=${encodeURIComponent(from_lat)}&from_lon=${encodeURIComponent(from_lon)}&to_lat=${encodeURIComponent(to_lat)}&to_lon=${encodeURIComponent(to_lon)}`;
+                    const res = await fetch(q);
+                    if (!res.ok) {
+                        console.warn('No se pudo obtener la ruta para incidente', incidente.id);
+                        return;
+                    }
+                    const body = await res.json();
+                    const geom = body.geometry; // GeoJSON LineString
+                    if (!geom || !geom.coordinates) return;
+
+                    // OSRM devuelve [lon, lat] — Leaflet espera [lat, lon]
+                    const latlngs = geom.coordinates.map(c => [c[1], c[0]]);
+
+                    const poly = L.polyline(latlngs, { weight: 5, opacity: 0.85 }).addTo(map);
+
+                    // optional: fit bounds to show route (solo si querés centrar)
+                    // map.fitBounds(poly.getBounds(), { padding: [40,40] });
+
+                    // guardar en window para limpiar luego
+                    window.routeLayers.push(poly);
+
+                } catch (err) {
+                    console.error('Error al dibujar ruta:', err);
+                }
+            }
+
+            function cargarAsignaciones() {
+                clearRoutes();
+
+                fetch('/api/asignaciones/')
+                    .then(res => res.json())
+                    .then(data => {
+                        data.forEach(asig => {
+                            try {
+                                const recurso = asig.recurso;
+                                const instit = recurso && recurso.institucion_base ? recurso.institucion_base : null;
+                                const incidenteId = asig.incidente;
+                                if (instit && instit.latitud && instit.longitud && incidenteId) {
+                                    fetch(`/api/incidentes/${incidenteId}/`)
+                                        .then(r => r.json())
+                                        .then(inc => {
+                                            if (inc.estado !== "ASIGNADO") return;
+                                            if (inc.latitud && inc.longitud) {
+                                                dibujarRuta(instit, inc);
+                                            }
+                                        })
+                                        .catch(err => console.warn('No se pudo obtener incidente', incidenteId, err));
+                                }
+                            } catch (e) {
+                                console.warn('Asignacion sin datos completos', asig, e);
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        console.warn('No se pudo cargar asignaciones', err);
+                    });
+            }
+
+            cargarAsignaciones();
             // -----------------------
             // Control de selección de ubicación
             // -----------------------
@@ -433,6 +508,7 @@
                     detalle: document.getElementById('detalle').value,
                     gravedad: parseInt(document.getElementById('gravedad').value),
                     estado: 'PENDIENTE',
+                    fecha_hora: new Date().toISOString(),
                     latitud: window.latitudSeleccionada,
                     longitud: window.longitudSeleccionada
                 };
@@ -458,7 +534,8 @@
                             if (layer instanceof L.Marker) map.removeLayer(layer);
                         });
                         cargarIncidentes();
-                        cargarInstituciones(); 
+                        cargarInstituciones();
+                        cargarAsignaciones();
 
                         disableReportButton();
                         window.latitudSeleccionada = null;
@@ -471,6 +548,7 @@
                     
                     .catch(err => alert(err));
             });
+
 
             // CSRF helper
             function getCookie(name) {
@@ -487,6 +565,8 @@
                 }
                 return cookieValue;
             }
+
+
         </script>
         
     {% elif rol == 'usuario' %}

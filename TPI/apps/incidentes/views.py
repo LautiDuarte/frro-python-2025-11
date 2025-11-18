@@ -14,36 +14,6 @@ class IncidenteViewSet(viewsets.ModelViewSet):
 
         asignar_incidentes_pendientes()
 
-        # Buscar recursos disponibles del tipo requerido
-        recursos_disponibles = Recurso.objects.filter(
-            estado="DISPONIBLE"
-        )
-
-        if not recursos_disponibles.exists():
-            print("⚠️ No hay recursos disponibles para asignar al incidente.")
-            return
-
-        # Calcular la distancia de cada recurso al incidente
-        recurso_mas_cercano = min(
-            recursos_disponibles,
-            key=lambda r: distancia_geografica(
-                incidente.latitud, incidente.longitud, *r.get_posicion()
-            )
-        )
-
-        # Asignar el recurso más cercano
-        recurso_mas_cercano.estado = "OCUPADO"
-        recurso_mas_cercano.save()
-
-        Asignacion.objects.create(
-            incidente=incidente,
-            recurso=recurso_mas_cercano,
-            tiempo_estimado_llegada=10,  # valor simbólico
-        )
-
-        incidente.estado = "ASIGNADO"
-        incidente.save()
-
 class AsignacionViewSet(viewsets.ModelViewSet):
-    queryset = Asignacion.objects.all()
+    queryset = Asignacion.objects.select_related('recurso__institucion_base','incidente').all()
     serializer_class = AsignacionSerializer

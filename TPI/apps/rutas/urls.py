@@ -1,7 +1,6 @@
-from rest_framework.routers import DefaultRouter
-from .views import RutaViewSet
+from django.urls import path
+from .views import ruta_mas_corta
 
-router = DefaultRouter()
-router.register(r'rutas', RutaViewSet)
-
-urlpatterns = router.urls
+urlpatterns = [
+    path('rutas/route/', ruta_mas_corta, name='ruta-mas-corta'),
+]

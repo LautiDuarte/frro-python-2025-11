@@ -7,6 +7,8 @@ class InstitucionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class RecursoSerializer(serializers.ModelSerializer):
+    institucion_base = InstitucionSerializer()
+
     class Meta:
         model = Recurso
         fields = "__all__"
